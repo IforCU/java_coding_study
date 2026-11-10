@@ -1,0 +1,21 @@
+<%-- 분석 전용 텍스트: 실행하거나 webapp/WAR에 복사하지 마세요.
+     의도적으로 역할 혼합, SQL 연결, 오류 노출, 자원 누락을 포함한 학습 자료입니다.
+     실제 자격 증명이나 실행 가능한 연결 설정은 제공하지 않습니다. --%>
+<%@ page import="java.sql.Connection,java.sql.Statement,java.sql.ResultSet,javax.sql.DataSource" %>
+<html><body><h1>예전 고객 검색 코드</h1>
+<%
+    try {
+        DataSource source = (DataSource) application.getAttribute("legacyDataSource");
+        Connection connection = source.getConnection();
+        Statement statement = connection.createStatement();
+        String sql = "SELECT id, name FROM phase2.customer WHERE name = '"
+                + request.getParameter("name") + "'";
+        ResultSet result = statement.executeQuery(sql);
+        while (result.next()) {
+            out.print("<p>" + result.getString("name") + "</p>");
+        }
+    } catch (Exception exception) {
+        out.print(exception.toString());
+    }
+%>
+</body></html>

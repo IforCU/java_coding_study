@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.banklearning.exercise.HistoryMapper">
+  <select id="search" parameterType="map" resultType="map">
+    SELECT id FROM phase3.transaction_history
+    WHERE 1 = 1
+    <!-- TODO: 필수 accountId와 선택 from/to 검색 조건을 추가하세요. -->
+    <!-- SQL 구조에 값을 직접 이어 붙이지 말고 MyBatis 바인딩을 사용합니다. -->
+  </select>
+</mapper>

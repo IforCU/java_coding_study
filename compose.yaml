@@ -1,0 +1,194 @@
+name: ${COMPOSE_PROJECT_NAME:-bank-java-learning}
+
+services:
+  db:
+    image: postgres:17.11-bookworm
+    profiles: [phase0, phase2, phase3, phase4, phase5, phase6, integration]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bank_learning}
+      POSTGRES_USER: ${POSTGRES_USER:-bank_learning}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-learning-only-password}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  migrate:
+    image: postgres:17.11-bookworm
+    profiles: [phase0, phase2, phase3, phase4, phase5, phase6, integration]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB:-bank_learning}
+      PGUSER: ${POSTGRES_USER:-bank_learning}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-learning-only-password}
+      API_DB_PASSWORD: ${API_DB_PASSWORD:-learning-api-only-password}
+    volumes:
+      - ./database/migrations:/migrations:ro
+      - ./database/seed:/seed:ro
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - >-
+        for script in /migrations/V*.sql; do psql -X -v ON_ERROR_STOP=1 -v api_password="$$API_DB_PASSWORD" -f "$$script"; done;
+        for script in /seed/R*.sql; do psql -X -v ON_ERROR_STOP=1 -f "$$script"; done
+    restart: "no"
+
+  legacy:
+    profiles: [phase0]
+    build:
+      context: .
+      dockerfile: docker/legacy/Dockerfile
+      target: runtime
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-bank_learning}
+      DB_USER: ${POSTGRES_USER:-bank_learning}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-learning-only-password}
+      DB_TIMEOUT_SECONDS: ${DB_TIMEOUT_SECONDS:-3}
+      JAVA_OPTS: -Dfile.encoding=UTF-8 -XX:MaxRAMPercentage=65.0
+    ports:
+      - "127.0.0.1:${LEGACY_PORT:-8080}:8080"
+    restart: unless-stopped
+
+  test:
+    profiles: [test]
+    build:
+      context: .
+      dockerfile: docker/legacy/Dockerfile
+      target: test
+    volumes:
+      - maven_cache:/root/.m2
+
+  exercise-test:
+    profiles: [exercise]
+    image: maven:3.10.0-eclipse-temurin-17-noble
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - maven_cache:/root/.m2
+    entrypoint: [mvn, -B, -ntp]
+    command: [-Pexercise-phase1, -pl, exercises/starter/phase-01, -am, test]
+
+  java-core:
+    profiles: [phase1]
+    build:
+      context: .
+      dockerfile: docker/java-core/Dockerfile
+
+  integration-test:
+    profiles: [integration]
+    build:
+      context: .
+      dockerfile: docker/legacy/Dockerfile
+      target: test
+    command: [mvn, -B, -ntp, -Pintegration-tests, verify]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-bank_learning}
+      DB_USER: ${POSTGRES_USER:-bank_learning}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-learning-only-password}
+      API_DB_USER: bank_learning_api
+      API_DB_PASSWORD: ${API_DB_PASSWORD:-learning-api-only-password}
+    volumes:
+      - maven_cache:/root/.m2
+
+  servlet-jsp:
+    profiles: [phase2]
+    build:
+      context: .
+      dockerfile: docker/servlet-jsp/Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-bank_learning}
+      DB_USER: ${POSTGRES_USER:-bank_learning}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-learning-only-password}
+    ports:
+      - "127.0.0.1:${SERVLET_PORT:-8082}:8080"
+    restart: unless-stopped
+
+  spring-mvc:
+    profiles: [phase3]
+    build:
+      context: .
+      dockerfile: docker/spring-mvc/Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-bank_learning}
+      DB_USER: ${POSTGRES_USER:-bank_learning}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-learning-only-password}
+    ports:
+      - "127.0.0.1:${MVC_PORT:-8083}:8080"
+    restart: unless-stopped
+
+  banking-transaction:
+    profiles: [phase4]
+    build:
+      context: .
+      dockerfile: docker/banking-transaction/Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-bank_learning}
+      DB_USER: ${POSTGRES_USER:-bank_learning}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-learning-only-password}
+    ports:
+      - "127.0.0.1:${TRANSACTION_PORT:-8084}:8080"
+    restart: unless-stopped
+
+  security-operations:
+    profiles: [phase5]
+    build:
+      context: .
+      dockerfile: docker/security-operations/Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-bank_learning}
+      DB_USER: ${POSTGRES_USER:-bank_learning}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-learning-only-password}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-learning-user-password}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-learning-admin-password}
+    ports:
+      - "127.0.0.1:${SECURITY_PORT:-8085}:8080"
+    restart: unless-stopped
+
+  spring-boot:
+    profiles: [phase6]
+    build:
+      context: .
+      dockerfile: docker/spring-boot/Dockerfile
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-bank_learning}
+      DB_USER: bank_learning_api
+      DB_PASSWORD: ${API_DB_PASSWORD:-learning-api-only-password}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-learning-user-password}
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-learning-admin-password}
+    ports:
+      - "127.0.0.1:${API_PORT:-8086}:8080"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  maven_cache:

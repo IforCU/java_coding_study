@@ -1,0 +1,10 @@
+.git
+.env
+.env.*
+**/target
+.tools
+.cache
+artifacts
+exercises
+lessons
+docs

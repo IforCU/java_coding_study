@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.banklearning.mvc.mapper.BankMapper">
+  <resultMap id="customerView" type="kr.banklearning.mvc.dto.BankViews$CustomerView">
+    <constructor><idArg column="id" javaType="java.lang.String"/><arg column="name" javaType="java.lang.String"/><arg column="status" javaType="java.lang.String"/></constructor>
+  </resultMap>
+  <resultMap id="accountView" type="kr.banklearning.mvc.dto.BankViews$AccountView">
+    <constructor><idArg column="id" javaType="java.lang.String"/><arg column="customer_id" javaType="java.lang.String"/><arg column="balance" javaType="java.math.BigDecimal"/></constructor>
+  </resultMap>
+  <resultMap id="transactionView" type="kr.banklearning.mvc.dto.BankViews$TransactionView">
+    <constructor><idArg column="id" javaType="java.lang.String"/><arg column="account_id" javaType="java.lang.String"/><arg column="type" javaType="java.lang.String"/><arg column="amount" javaType="java.math.BigDecimal"/><arg column="balance_after" javaType="java.math.BigDecimal"/><arg column="occurred_at" javaType="java.time.OffsetDateTime"/></constructor>
+  </resultMap>
+  <select id="customers" resultMap="customerView">SELECT CAST(id AS varchar) AS id, name, status FROM phase3.customer ORDER BY name, id</select>
+  <select id="customer" resultMap="customerView">SELECT CAST(id AS varchar) AS id, name, status FROM phase3.customer WHERE id = CAST(#{id} AS uuid)</select>
+  <insert id="insertCustomer">INSERT INTO phase3.customer (id, name, status) VALUES (CAST(#{customer.id} AS uuid), #{customer.name}, #{customer.status})</insert>
+  <update id="changeStatus">UPDATE phase3.customer SET status = #{status} WHERE id = CAST(#{id} AS uuid)</update>
+  <select id="accounts" resultMap="accountView">
+    SELECT CAST(id AS varchar) AS id, CAST(customer_id AS varchar) AS customer_id, balance FROM phase3.account
+    <where><if test="customerId != null">customer_id = CAST(#{customerId} AS uuid)</if></where> ORDER BY id
+  </select>
+  <select id="account" resultMap="accountView">SELECT CAST(id AS varchar) AS id, CAST(customer_id AS varchar) AS customer_id, balance FROM phase3.account WHERE id = CAST(#{id} AS uuid)</select>
+  <insert id="insertAccount">INSERT INTO phase3.account (id, customer_id, balance) VALUES (CAST(#{account.id} AS uuid), CAST(#{account.customerId} AS uuid), #{account.balance})</insert>
+  <select id="history" resultMap="transactionView">
+    SELECT CAST(id AS varchar) AS id, CAST(account_id AS varchar) AS account_id, type, amount, balance_after, occurred_at
+    FROM phase3.transaction_history
+    <where>
+      account_id = CAST(#{accountId} AS uuid)
+      <if test="fromInclusive != null">AND occurred_at &gt;= #{fromInclusive}</if>
+      <if test="toExclusive != null">AND occurred_at &lt; #{toExclusive}</if>
+    </where>
+    ORDER BY occurred_at, id
+  </select>
+  <select id="ready" resultType="boolean">SELECT (SELECT count(*) FROM phase3.customer) &gt;= 0 AND (SELECT count(*) FROM phase3.account) &gt;= 0 AND (SELECT count(*) FROM phase3.transaction_history) &gt;= 0</select>
+</mapper>
