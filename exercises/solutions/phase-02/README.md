@@ -28,8 +28,16 @@
 
 ## 선택 검증
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Psolution-phase2 -pl exercises/solutions/phase-02 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Psolution-phase2 -pl exercises/solutions/phase-02 -am verify
+sh ./mvnw -Psolution-phase2 -pl exercises/solutions/phase-02 -am verify
 ```
 
 정답 모듈도 starter의 동일 계약 테스트를 사용합니다. 테스트를 변경해 기대값을 낮추지 말고 본인의 구현과 경계 조건을 비교하세요. 실제 결과는 루트 `PROGRESS.md`에서 확인합니다.

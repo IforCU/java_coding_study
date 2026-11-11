@@ -3,6 +3,8 @@
   <display-name>은행 JSP 화면 실습</display-name>
   <servlet><servlet-name>accounts</servlet-name><servlet-class>kr.banklearning.jsplab.AccountLabServlet</servlet-class></servlet>
   <servlet-mapping><servlet-name>accounts</servlet-name><url-pattern>/accounts</url-pattern></servlet-mapping>
+  <servlet><servlet-name>workbench</servlet-name><servlet-class>kr.banklearning.jsplab.WorkbenchServlet</servlet-class></servlet>
+  <servlet-mapping><servlet-name>workbench</servlet-name><url-pattern>/workbench</url-pattern></servlet-mapping>
   <welcome-file-list><welcome-file>accounts</welcome-file></welcome-file-list>
   <error-page><error-code>500</error-code><location>/error.html</location></error-page>
 </web-app>

@@ -18,3 +18,5 @@ starter JSP는 `exercises/starter/phase-02/jstl`에 있습니다. WAR 빌드 시
 로컬 미리보기와 HTTP 테스트는 테스트 소스의 `LabServer`에서 내장 Tomcat과 Jasper를 실행합니다. `WEB-INF` JSP는 URL로 직접 읽지 못하며 `/accounts` Servlet을 거쳐야 합니다. 내장 서버, JUnit, 테스트 클래스는 WAR에 포함되지 않습니다. 로컬 JSP는 파일을 직접 읽으므로 수정 후 새로고침할 수 있습니다.
 
 Compose의 `jstl-lab` 프로필은 Tomcat 10.1 / JDK 17 컨테이너로 starter WAR만 실행합니다. PostgreSQL이나 migration 서비스에 의존하지 않습니다. 외부 포트는 기본 `127.0.0.1:8087`입니다.
+
+Phase 3~6 화면 실습도 이 실행 모듈을 재사용합니다. `jstl-phase3`~`jstl-phase6` 프로필로 단계별 starter 디렉터리를 선택하며, 기본값은 기존 Phase 2입니다. 새 단계는 `WorkbenchServlet`의 `/workbench`와 별도의 JSP를 사용합니다. WAR와 전개 경로에 단계·starter/solution을 모두 넣어 교차 오염을 방지합니다. 서로 다른 단계를 같은 모듈에서 동시에 빌드하지 않습니다.

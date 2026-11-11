@@ -1,11 +1,21 @@
 # Phase 5 — 보안과 장애 랩 검증
 
+화면 과제의 렌더링·완성 계약은 [JSTL 검증](jstl/verification.md)을 따릅니다. 아래 본편 테스트와 분리해 기록합니다. Wrapper에는 JDK 17이 필요하며 Maven 전역 설치는 필요하지 않습니다.
+
 프로젝트 루트 기준입니다. 아래는 재현 절차와 기대 결과이며 실제 실행 기록은 `PROGRESS.md`에서 확인합니다. 단위 테스트, 장애 증상 재현, 실제 Docker·DB·Tomcat 검증 결과를 구분합니다.
 
 ## 정상 빌드와 보안 단위 테스트
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/05-security-operations -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/05-security-operations -am verify
+sh ./mvnw -pl modules/05-security-operations -am verify
 ```
 
 기대 결과: 정상 `security-operations.war`가 생성되고 MockMvc의 인증·역할·CSRF·입력·오류·추적 단위 검증이 통과합니다. test/labs 클래스와 starter·정답은 WAR에 들어가지 않습니다. MockMvc 성공을 실제 Tomcat 쿠키·JSP·PostgreSQL 실행 성공으로 집계하지 않습니다.
@@ -34,8 +44,16 @@ docker compose --profile phase5 ps -a
 
 ## 격리 장애 랩
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/05-security-operations -am "-Dtest=MaintenanceLabTest" "-Dsurefire.failIfNoSpecifiedTests=false" test
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/05-security-operations -am -Dtest=MaintenanceLabTest -Dsurefire.failIfNoSpecifiedTests=false test
+sh ./mvnw -pl modules/05-security-operations -am -Dtest=MaintenanceLabTest -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
 기대 결과: 여덟 의도적인 장애 증상이 fixture에서 관찰됩니다. 이 PASS는 교정 완료가 아닙니다. 개별 증상·과제는 [incidents.md](../../exercises/starter/phase-05/incidents.md)를 확인합니다.
@@ -48,16 +66,32 @@ docker compose --profile integration run --build --rm integration-test
 
 호스트에서 학습 DB의 `DB_URL`, `DB_USER`, `DB_PASSWORD`가 준비되었다면 해당 모듈만 실행할 수 있습니다.
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/05-security-operations -am -Pintegration-tests verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/05-security-operations -am -Pintegration-tests verify
+sh ./mvnw -pl modules/05-security-operations -am -Pintegration-tests verify
 ```
 
 실제 SQL 조건, Hikari 풀 대기·회복, statement timeout, 잘못된 auto-commit 범위를 `phase5_lab` fixture에서 검증합니다. DB 환경이 없으면 실패 원인 또는 `NOT RUN`을 기록하고 자동 생략을 PASS로 집계하지 않습니다. 자세한 범위는 [장애 랩 안내](../../docs/troubleshooting/maintenance-labs.md)를 확인합니다.
 
 ## 선택 마스킹 실습
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase5 -pl exercises/starter/phase-05 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase5 -pl exercises/starter/phase-05 -am verify
+sh ./mvnw -Pexercise-phase5 -pl exercises/starter/phase-05 -am verify
 ```
 
 TODO는 실패가 기대됩니다. 작성 후 ASCII 숫자·구분자·길이·마스킹·원문 비노출 계약이 통과해야 합니다. 정답은 별도 solutions 프로필로만 선택합니다.

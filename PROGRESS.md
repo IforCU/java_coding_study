@@ -1,5 +1,16 @@
 # Project Progress
 
+## 2026-11-11 Phase 2~6 Wrapper·화면 과제 갱신
+
+- `phase-02`에서 작업을 시작했고 시작 시 작업 폴더는 깨끗했다. Phase 2~6 본편·실습·정답 문서의 전역 `mvn` 명령을 Windows `.\mvnw.cmd`와 POSIX `sh ./mvnw`로 교체했다. PowerShell의 `-D` 및 복수 `-P` 인자는 인용하고 기존 Docker 명령은 유지했다. 대상 문서에 전역 mvn 명령이 남지 않았음을 정적 검색으로 확인했다.
+- 기존 Phase 2 계좌 JSP는 보존했다. Phase 3 거래 검색·한국 시각, Phase 4 이체 상태·취소 요청 안내, Phase 5 마스킹 감사·거절 표시, Phase 6 중첩 API 응답 표시를 별도 starter/정답과 한국어 교재 각 5종으로 추가했다. 기본 업무 모듈·DB·보안·Boot API는 변경하지 않았다.
+- 기존 JSP lab에 `jstl-phase3`~`jstl-phase6` 선택 프로필과 `/workbench` fixture를 추가했다. JSP는 표시만 하고 금액은 BigDecimal을 사용한다. Phase 5의 거절 fixture는 Servlet에서도 감사 목록을 비우며, demo 파라미터가 실제 인가 기능이 아님을 교재에 명시했다. WAR 이름·전개 디렉터리에 단계와 starter/solution을 모두 포함해 격리했다.
+- **PASS:** 각 단계 `mvnw.cmd -o -f exercises/jstl-bank-lab/pom.xml -Pjstl-phaseN verify` (N=3~6). starter 실제 Jasper/HTTP smoke 1개 통과, 완성 계약 4개는 의도적 skipped. **예상 실패 확인:** `"-Pjstl-phaseN,jstl-check" test`는 각 단계 5개 중 완성 계약 4개 실패, errors/skipped 0이었다. **PASS:** `"-Pjstl-phaseN,jstl-solution" verify`는 각 단계 5개, 합계 20개 통과, failures/errors/skipped 0. 로그는 `.cache/jstl-p03-*`~`jstl-p06-*.log`에 분리했다. 복수 프로필의 최초 무인용 PowerShell 호출은 파서 오류였고 인용 후 검증했다.
+- **PASS:** 기존 Phase 2 starter `mvnw.cmd -o -f exercises/jstl-bank-lab/pom.xml verify` (smoke 2개 통과/계약 5개 skipped), `-Pjstl-solution verify` (7개 통과, failures/errors/skipped 0). 관련 로그 `.cache/jstl-p02-starter.log`, `jstl-p02-solution.log`.
+- **PASS:** `.\mvnw.cmd -o verify`, 기본 7모듈 171개 통과. **PASS:** `solution-phase2`~`solution-phase6` 선택 Wrapper 빌드, 기존 Java/SQL 정답 계약 58개 통과. XML 집계와 `.cache/phase02-06-wrapper-regression.log`, `phase02-06-solutions.log`에 근거를 남겼다. 본편의 미완성 starter는 수정하지 않았다.
+- **PASS:** Compose `jstl-lab` 설정 검사, Phase 2~6 Markdown 로컬 링크 검사, diff 공백 검사. Docker는 같은 루트 서비스의 `JSTL_PHASE` 빌드 인자로 단계만 선택하며 이미지에 정답을 복사하지 않는다. 기존 `.env`는 변경하지 않았다.
+- 검증은 JDK 21에서 release 17 대상으로 수행했다. 실제 JDK 17, Linux/macOS 네이티브 실행, Docker 이미지 빌드·기동, 실제 DB·API 연동과 브라우저 시각 검토는 **NOT RUN / 대기**다. 이번 변경을 Docker/DB까지 전체 완료로 기록하지 않는다. 로컬 검증 뒤 사용자 지시에 따라 관련 변경을 커밋·main cherry-pick하고 phase-02로 복귀하며 Git push는 하지 않는다.
+
 ## Current Phase
 **Phase 0~6 기준 구현 보존. JSP/JSTL 보조 실습 로컬 검증 완료, 해당 실습 Docker 검증 대기.**
 

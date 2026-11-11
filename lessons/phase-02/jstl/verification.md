@@ -8,7 +8,7 @@
 .\mvnw.cmd -Pjstl-lab -pl exercises/jstl-bank-lab -am verify
 ```
 
-기대 결과: JSP 실제 컴파일·HTTP 응답과 CSS, WEB-INF 직접 접근 차단 검사 2개 통과. 완성 동작 검사 5개는 이 단계에서 건너뜁니다. starter의 TODO가 남아 있어도 실행 준비는 가능해야 합니다. `exercises/jstl-bank-lab/target/jstl-bank-lab-starter.war`가 생성됩니다.
+기대 결과: JSP 실제 컴파일·HTTP 응답과 CSS, WEB-INF 직접 접근 차단 검사 2개 통과. 완성 동작 검사 5개는 이 단계에서 건너뜁니다. starter의 TODO가 남아 있어도 실행 준비는 가능해야 합니다. `exercises/jstl-bank-lab/target/jstl-bank-lab-02-starter.war`가 생성됩니다.
 
 ## 2. 브라우저 실습
 

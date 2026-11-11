@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnabledIfSystemProperty(named="lab.phase", matches="02")
 class AccountPageTest {
     private static LabServer server;
     private static final HttpClient HTTP = HttpClient.newHttpClient();

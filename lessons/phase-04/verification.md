@@ -1,11 +1,21 @@
 # Phase 4 — 이체 검증
 
+화면 과제의 렌더링·완성 계약은 [JSTL 검증](jstl/verification.md)을 따릅니다. 아래 본편 테스트와 분리해 기록합니다. Wrapper에는 JDK 17이 필요하며 Maven 전역 설치는 필요하지 않습니다.
+
 명령은 프로젝트 루트 기준입니다. 아래는 재현 절차와 기대 결과이며 실제 PASS 로그가 아닙니다. 로컬 테스트와 실제 PostgreSQL·Docker 통합 검증의 최신 결과는 `PROGRESS.md`를 확인합니다.
 
 ## 로컬 빌드와 단위 테스트
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/04-banking-transaction -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/04-banking-transaction -am verify
+sh ./mvnw -pl modules/04-banking-transaction -am verify
 ```
 
 기대 결과: 정상 모듈이 빌드되고 `target/banking-transaction.war`가 생성됩니다. 서비스 대역 테스트는 입력, 업무 분기, 호출 순서와 결과를 확인할 수 있지만 실제 DB rollback·행 잠금·동시성을 증명하지 않습니다.
@@ -51,8 +61,16 @@ docker compose --profile integration run --build --rm integration-test
 
 호스트에서 이미 준비한 학습 DB를 사용하는 경우에는 `DB_URL`, `DB_USER`, `DB_PASSWORD`를 해당 학습 DB로 설정한 뒤 실행합니다. 실제 운영 연결 정보는 사용하지 않습니다.
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/04-banking-transaction -am -Pintegration-tests verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/04-banking-transaction -am -Pintegration-tests verify
+sh ./mvnw -pl modules/04-banking-transaction -am -Pintegration-tests verify
 ```
 
 기본 단위 테스트 명령은 `*IT.java`를 실행하지 않습니다. 통합 프로필을 선택하고도 DB 환경변수가 없으면 실패해야 하며 자동 생략을 PASS로 기록하지 않습니다. 위 두 실행 경로의 실제 DB 결과는 `PROGRESS.md`에 별도로 기록합니다.
@@ -63,8 +81,16 @@ mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/04-banking-transactio
 
 ## 선택 잠금 정책 실습
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase4 -pl exercises/starter/phase-04 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase4 -pl exercises/starter/phase-04 -am verify
+sh ./mvnw -Pexercise-phase4 -pl exercises/starter/phase-04 -am verify
 ```
 
 TODO 상태에서는 실패해야 합니다. 완성 후 같은 UUID 쌍의 입력 방향과 부호 경계, 불변성·잘못된 입력 테스트가 통과해야 합니다. 정답 비교는 solutions 안내에서 선택합니다.

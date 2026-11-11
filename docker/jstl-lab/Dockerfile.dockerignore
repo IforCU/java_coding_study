@@ -9,4 +9,16 @@
 !exercises/starter/phase-02/
 !exercises/starter/phase-02/jstl/
 !exercises/starter/phase-02/jstl/**
+!exercises/starter/phase-03/
+!exercises/starter/phase-03/jstl/
+!exercises/starter/phase-03/jstl/**
+!exercises/starter/phase-04/
+!exercises/starter/phase-04/jstl/
+!exercises/starter/phase-04/jstl/**
+!exercises/starter/phase-05/
+!exercises/starter/phase-05/jstl/
+!exercises/starter/phase-05/jstl/**
+!exercises/starter/phase-06/
+!exercises/starter/phase-06/jstl/
+!exercises/starter/phase-06/jstl/**
 **/target/

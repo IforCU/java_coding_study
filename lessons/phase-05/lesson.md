@@ -1,5 +1,7 @@
 # Phase 5 — 보안 경계와 유지보수 분석
 
+직접 작성할 화면 과제는 [단계별 JSTL 실습](jstl/lesson.md)에 있습니다. 기존 계좌 목록 문제를 반복하지 않고 이 단계의 표시·상태·오류 분기를 연습합니다.
+
 정상 모듈은 `modules/05-security-operations`입니다. Spring MVC와 Spring Security로 사용자 인증, 본인 정보 조회, 관리자 감사 조회, CSRF와 세션, 출력과 로깅 경계를 학습합니다. 의도적인 오류는 별도 테스트 fixture에만 둡니다.
 
 ## 인증과 인가

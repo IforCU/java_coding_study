@@ -1,5 +1,7 @@
 # Phase 6 실습 — 최대 반환 건수 정책
 
+JSP/JSTL 화면 과제는 [별도 실습](jstl/exercise.md)을 진행합니다. 아래 본편 Java/SQL 과제와 독립적이며 [실행 안내](jstl/lesson.md)에서 시작합니다.
+
 아래 Maven 명령은 프로젝트 루트에서 실행합니다.
 
 수정 파일은 [`PageSize.java`](../../exercises/starter/phase-06/src/main/java/kr/banklearning/exercise/PageSize.java)입니다. 정상 Boot API와 분리된 실습 모듈이며 기본 실행에 포함되지 않습니다.
@@ -23,8 +25,16 @@
 
 유효하지 않은 값을 자동으로 1이나 200으로 바꾸지 않습니다. null과 0의 의미를 구분하고 Integer 범위 끝도 검증합니다. 이 정책은 조회 건수 제한이며 cursor·offset 기반 페이지 탐색 구현은 요구하지 않습니다.
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase6 -pl exercises/starter/phase-06 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase6 -pl exercises/starter/phase-06 -am verify
+sh ./mvnw -Pexercise-phase6 -pl exercises/starter/phase-06 -am verify
 ```
 
 미완성 TODO는 실패가 기대됩니다. 구현 후 기본값·경계·범위 오류·입력 비노출·반복 요청 테스트를 통과시키세요. 정답과 해설은 solutions에만 둡니다.

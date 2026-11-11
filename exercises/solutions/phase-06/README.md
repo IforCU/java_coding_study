@@ -10,8 +10,16 @@ null은 요청 파라미터 누락을 의미하므로 기본값 50을 반환합�
 
 이 정책은 최대 반환 건수 제한입니다. offset, cursor, 전체 건수나 다음 페이지 토큰을 제공하는 페이지 탐색 구현이 아닙니다. 응답 크기를 제한해도 모든 느린 쿼리 문제가 해결되는 것은 아니므로 인덱스와 기간 조건도 별도로 확인합니다.
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Psolution-phase6 -pl exercises/solutions/phase-06 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Psolution-phase6 -pl exercises/solutions/phase-06 -am verify
+sh ./mvnw -Psolution-phase6 -pl exercises/solutions/phase-06 -am verify
 ```
 
 starter의 같은 계약 테스트를 사용합니다. 실제 실행 결과는 루트 `PROGRESS.md`에서 확인합니다.

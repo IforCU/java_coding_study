@@ -1,11 +1,21 @@
 # Phase 6 — 조회 API 검증
 
+화면 과제의 렌더링·완성 계약은 [JSTL 검증](jstl/verification.md)을 따릅니다. 아래 본편 테스트와 분리해 기록합니다. Wrapper에는 JDK 17이 필요하며 Maven 전역 설치는 필요하지 않습니다.
+
 프로젝트 루트에서 실행합니다. 아래는 재현 절차와 기대 결과이며 실제 PASS 로그가 아닙니다. 로컬 빌드·테스트와 Docker·DB 검증의 최신 결과는 `PROGRESS.md`에서 확인합니다.
 
 ## 로컬 빌드
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/06-spring-boot -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/06-spring-boot -am verify
+sh ./mvnw -pl modules/06-spring-boot -am verify
 ```
 
 기대 결과: 정상 API JAR가 생성되고 JUnit·Mockito·HTTP 계약 테스트가 통과합니다. 테스트 대역의 성공으로 PostgreSQL 권한과 조회 결과가 검증되었다고 판단하지 않습니다.
@@ -52,14 +62,22 @@ curl.exe -i --user admin:learning-admin-password "http://127.0.0.1:8086/api/admi
 docker compose --profile integration run --build --rm integration-test
 ```
 
-실제 DB IT는 UUID·금액·시각 매핑, 기간 경계, 조회 역할의 쓰기 거절과 기존 업무 데이터 보존을 확인합니다. 학습 DB 환경변수를 준비한 호스트에서는 `mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/06-spring-boot -am -Pintegration-tests verify`로 선택합니다. IT의 `DB_URL`, `DB_USER`, `DB_PASSWORD`는 자기 fixture를 준비하는 소유자 연결이고 `API_DB_USER`, `API_DB_PASSWORD`는 조회 역할 연결입니다. 정상 API 실행의 DB 연결은 조회 역할만 사용합니다. 소유 범위와 HTTP 요청 분기는 별도 서비스·HTTP 테스트와 함께 확인합니다.
+실제 DB IT는 UUID·금액·시각 매핑, 기간 경계, 조회 역할의 쓰기 거절과 기존 업무 데이터 보존을 확인합니다. 학습 DB 환경변수를 준비한 호스트에서는 `.\mvnw.cmd -pl modules/06-spring-boot -am -Pintegration-tests verify`로 선택합니다. IT의 `DB_URL`, `DB_USER`, `DB_PASSWORD`는 자기 fixture를 준비하는 소유자 연결이고 `API_DB_USER`, `API_DB_PASSWORD`는 조회 역할 연결입니다. 정상 API 실행의 DB 연결은 조회 역할만 사용합니다. 소유 범위와 HTTP 요청 분기는 별도 서비스·HTTP 테스트와 함께 확인합니다.
 
 로컬 코드 테스트와 실제 권한·DB·내장 서버 검증을 나누고 DB가 없으면 `NOT RUN`을 남깁니다. 데이터 삭제나 볼륨 초기화로 검증하지 않습니다.
 
 ## 선택 건수 정책 실습
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase6 -pl exercises/starter/phase-06 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase6 -pl exercises/starter/phase-06 -am verify
+sh ./mvnw -Pexercise-phase6 -pl exercises/starter/phase-06 -am verify
 ```
 
 TODO 상태에서는 실패해야 합니다. 완성 후 기본값·범위·반복 호출 계약이 통과해야 합니다. 기본 빌드와 API JAR는 이 TODO와 정답을 포함하지 않습니다.

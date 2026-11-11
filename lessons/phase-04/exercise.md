@@ -1,5 +1,7 @@
 # Phase 4 실습 — 계좌 잠금 순서
 
+JSP/JSTL 화면 과제는 [별도 실습](jstl/exercise.md)을 진행합니다. 아래 본편 Java/SQL 과제와 독립적이며 [실행 안내](jstl/lesson.md)에서 시작합니다.
+
 아래 Maven 명령은 프로젝트 루트에서 실행합니다.
 
 서로 반대 방향의 이체가 각각 자기 출금 계좌부터 잠그면 상대 계좌를 기다리며 교착할 수 있습니다. 이번 실습은 두 계좌를 항상 같은 순서로 돌려주는 작은 정책을 작성합니다. 실제 DB 잠금은 획득하지 않습니다.
@@ -21,8 +23,16 @@
 
 ## 선택 검증
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase4 -pl exercises/starter/phase-04 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase4 -pl exercises/starter/phase-04 -am verify
+sh ./mvnw -Pexercise-phase4 -pl exercises/starter/phase-04 -am verify
 ```
 
 초기 TODO는 실패해야 합니다. 구현 후 고정 사례, 부호 경계, 재현 가능한 256개 UUID 쌍과 반대 입력, null·중복, 목록 불변성 검증이 통과해야 합니다. 테스트의 비교 기준을 바꾸어 문제를 피해 가지 않습니다.

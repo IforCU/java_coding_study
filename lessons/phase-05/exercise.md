@@ -1,5 +1,7 @@
 # Phase 5 실습 — 감사 표시 마스킹과 장애 분석
 
+JSP/JSTL 화면 과제는 [별도 실습](jstl/exercise.md)을 진행합니다. 아래 본편 Java/SQL 과제와 독립적이며 [실행 안내](jstl/lesson.md)에서 시작합니다.
+
 아래 Maven 명령은 프로젝트 루트에서 실행합니다.
 
 ## 마스킹 TODO
@@ -24,8 +26,16 @@
 
 Unicode 숫자, 탭, 줄바꿈, 다른 종류의 하이픈과 보이지 않는 공백은 허용 구분자가 아닙니다. 임의 문자를 모두 지워 유효한 값처럼 바꾸지 않습니다.
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase5 -pl exercises/starter/phase-05 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase5 -pl exercises/starter/phase-05 -am verify
+sh ./mvnw -Pexercise-phase5 -pl exercises/starter/phase-05 -am verify
 ```
 
 TODO 상태에서는 실패해야 합니다. 구현 후 길이 경계, 구분자, ASCII 범위, 원문 비노출, 반복 호출 검증을 통과시킵니다. 테스트를 바꾸어 기대값을 낮추지 않습니다.
