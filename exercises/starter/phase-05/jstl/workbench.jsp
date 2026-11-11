@@ -53,8 +53,8 @@
                                 <caption>감사 내역</caption>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
                                         <th>계좌</th>
+                                        <th>작업</th>
                                         <th>요청 ID</th>
                                     </tr>
                                 </thead>
