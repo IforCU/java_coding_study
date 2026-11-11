@@ -1,11 +1,21 @@
 # Phase 3 — 실행과 검증
 
+화면 과제의 렌더링·완성 계약은 [JSTL 검증](jstl/verification.md)을 따릅니다. 아래 본편 테스트와 분리해 기록합니다. Wrapper에는 JDK 17이 필요하며 Maven 전역 설치는 필요하지 않습니다.
+
 프로젝트 루트에서 실행합니다. 아래는 재현 절차와 기대 결과입니다. 로컬 테스트와 Docker·실제 DB·Tomcat JSP 검증의 최신 결과는 `PROGRESS.md`를 확인하며 실행하지 않은 항목은 `NOT RUN`으로 기록합니다.
 
 ## 로컬 빌드와 단위 검증
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/03-spring-mvc -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/03-spring-mvc -am verify
+sh ./mvnw -pl modules/03-spring-mvc -am verify
 ```
 
 기대 결과: 정상 모듈의 설정·서비스·Mapper·HTTP 단위 검증이 통과하고 `modules/03-spring-mvc/target/spring-mvc.war`가 생성됩니다. 단위 검증의 실제 범위와 테스트 수는 진행 기록을 확인합니다. 대역으로 생성한 서비스는 실제 DB commit/rollback을 검증하지 않습니다.
@@ -33,8 +43,16 @@ docker compose --profile phase3 ps -a
 
 ## 선택 Mapper 실습
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase3 -pl exercises/starter/phase-03 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase3 -pl exercises/starter/phase-03 -am verify
+sh ./mvnw -Pexercise-phase3 -pl exercises/starter/phase-03 -am verify
 ```
 
 초기 starter는 XML 파싱에 성공하되 필수 필터·바인딩 계약에서 실패하는 것이 기대됩니다. 작성 후 네 가지 검색 조합, 명시적 null, 값 바인딩과 문자열 치환 금지 검증이 통과해야 합니다.

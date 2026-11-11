@@ -123,6 +123,16 @@ sh scripts/verify-all.sh --restart --integration
 
 접속 주소는 `http://127.0.0.1:8087/accounts`입니다. 화면 TODO는 `exercises/starter/phase-02/jstl/accounts.jsp`에 있고 기본 빌드·업무 앱에는 포함되지 않습니다. 별도 Docker 실행은 교재의 `jstl-lab` 프로필 안내를 따릅니다.
 
+| 단계 | 추가 화면 실습 | 실행 프로필 |
+| --- | --- | --- |
+| 2 | [계좌 목록](lessons/phase-02/jstl/lesson.md), 기존 문제 유지 | 기본값 |
+| 3 | [거래 내역 검색·날짜 표시](lessons/phase-03/jstl/lesson.md) | `jstl-phase3` |
+| 4 | [이체 상태·취소 요청 안내](lessons/phase-04/jstl/lesson.md) | `jstl-phase4` |
+| 5 | [마스킹된 감사 내역·거절 표시](lessons/phase-05/jstl/lesson.md) | `jstl-phase5` |
+| 6 | [API 조회 결과·오류 표시](lessons/phase-06/jstl/lesson.md) | `jstl-phase6` |
+
+Phase 3~6은 위 명령에 해당 `-Pjstl-phase3` 등을 추가하고 `/workbench`로 접속합니다. 여러 프로필을 함께 선택할 때는 PowerShell에서 `"-Pjstl-phase3,jstl-check"`처럼 따옴표로 묶습니다. 모든 화면은 DB 없는 별도 조회 실습이며 본편 금융 거래·보안·API 구현을 바꾸지 않습니다.
+
 각 교재는 개념 → 기준 코드 흐름 → 과제 → 힌트 → 검증 순서입니다. `modules`는 정상 기준 구현, `exercises/starter`는 직접 작성할 TODO입니다. TODO와 정답은 기본 빌드·실행에 포함되지 않습니다.
 
 Phase 1~6 실습 테스트는 아래 명령에서 번호와 경로를 바꿔 실행합니다. 수정 전에는 계약 테스트가 실패하는 것이 정상입니다.

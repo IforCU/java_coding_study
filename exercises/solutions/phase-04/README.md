@@ -16,8 +16,16 @@ DB와 같은 순서가 항상 모든 시스템의 필수 조건인 것은 아니
 
 ## 선택 검증
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Psolution-phase4 -pl exercises/solutions/phase-04 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Psolution-phase4 -pl exercises/solutions/phase-04 -am verify
+sh ./mvnw -Psolution-phase4 -pl exercises/solutions/phase-04 -am verify
 ```
 
 정답 모듈은 starter의 같은 계약 테스트를 사용합니다. 정렬 테스트의 성공이 PostgreSQL에서 실제 deadlock·rollback·동시 출금을 검증했다는 뜻은 아닙니다. 실제 DB 통합 검증 결과는 루트 `PROGRESS.md`에서 확인합니다.

@@ -14,7 +14,8 @@ public final class LabServer implements AutoCloseable {
     public LabServer(int port) throws Exception {
         Path module = Path.of(System.getProperty("lab.module")).toAbsolutePath().normalize();
         Path views = Path.of(System.getProperty("lab.views")).toAbsolutePath().normalize();
-        Path base = Files.createDirectories(module.resolve("target/tomcat-" + port));
+        Path base = Files.createDirectories(module.resolve("target/tomcat-"
+                + System.getProperty("lab.phase", "02") + "-" + port));
         tomcat = new Tomcat();
         tomcat.setBaseDir(base.toString());
         tomcat.setHostname("127.0.0.1");
@@ -44,7 +45,8 @@ public final class LabServer implements AutoCloseable {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try { server.close(); } catch (Exception ignored) { /* 종료 시 내부 예외를 출력하지 않는다. */ }
         }));
-        System.out.println("JSTL lab: " + server.url() + "/accounts (Ctrl+C to stop)");
+        String route = "02".equals(System.getProperty("lab.phase", "02")) ? "/accounts" : "/workbench";
+        System.out.println("JSTL lab: " + server.url() + route + " (Ctrl+C to stop)");
         server.tomcat.getServer().await();
     }
 }

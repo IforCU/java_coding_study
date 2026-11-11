@@ -1,5 +1,7 @@
 # Phase 3 실습 — 선택 기간 검색 Mapper
 
+JSP/JSTL 화면 과제는 [별도 실습](jstl/exercise.md)을 진행합니다. 아래 본편 Java/SQL 과제와 독립적이며 [실행 안내](jstl/lesson.md)에서 시작합니다.
+
 아래 Maven 명령은 프로젝트 루트에서 실행합니다.
 
 수정할 파일은 [`HistoryMapper.xml`](../../exercises/starter/phase-03/src/main/resources/exercise/HistoryMapper.xml)입니다. 정상 Spring MVC WAR와 분리된 실습 리소스입니다. 초기 XML은 읽을 수 있지만 필터가 빠져 있어 계약 테스트가 실패해야 합니다.
@@ -28,8 +30,16 @@
 
 ## 검증
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase3 -pl exercises/starter/phase-03 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase3 -pl exercises/starter/phase-03 -am verify
+sh ./mvnw -Pexercise-phase3 -pl exercises/starter/phase-03 -am verify
 ```
 
 계약 테스트는 계좌만, 시작만, 종료만, 양쪽 날짜가 있는 경우를 비교합니다. BoundSql의 조건·물음표·parameter mapping과 PreparedStatement 대역에 전달된 인덱스·값을 확인합니다. SQL처럼 보이는 입력도 SQL 구조로 삽입되지 않아야 합니다.

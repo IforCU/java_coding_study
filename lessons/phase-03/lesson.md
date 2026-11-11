@@ -1,5 +1,7 @@
 # Phase 3 — Spring MVC와 MyBatis로 책임 연결하기
 
+직접 작성할 화면 과제는 [단계별 JSTL 실습](jstl/lesson.md)에 있습니다. 기존 계좌 목록 문제를 반복하지 않고 이 단계의 표시·상태·오류 분기를 연습합니다.
+
 정상 모듈은 `modules/03-spring-mvc`입니다. Phase 2의 Servlet/JDBC WAR를 유지하고 별도 Spring MVC WAR와 `phase3` 스키마를 사용합니다. 고객·계좌 관리에 고객 상태와 거래 기간 검색을 추가합니다.
 
 ## IoC, DI, Bean

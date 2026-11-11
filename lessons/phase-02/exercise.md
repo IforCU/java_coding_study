@@ -21,8 +21,16 @@ JSP를 직접 작성하는 과제는 별도의 [내 계좌 조회 화면 실습]
 
 길이는 Java 문자열의 UTF-16 코드 단위 기준입니다. HTML 태그 제거, SQL 처리, 화면 출력은 이 작은 함수의 책임에 추가하지 않습니다. 검증과 출력 처리는 다른 경계에서 학습합니다.
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase2 -pl exercises/starter/phase-02 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase2 -pl exercises/starter/phase-02 -am verify
+sh ./mvnw -Pexercise-phase2 -pl exercises/starter/phase-02 -am verify
 ```
 
 TODO를 구현하기 전에는 실패해야 합니다. 테스트를 변경해 통과시키지 말고 구현을 수정합니다. 힌트는 [hints.md](hints.md)에 있습니다.

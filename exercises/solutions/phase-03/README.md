@@ -20,8 +20,16 @@ SQL처럼 보이는 문자열 테스트는 값이 SQL 구조로 삽입되지 않
 
 ## 선택 검증
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Psolution-phase3 -pl exercises/solutions/phase-03 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Psolution-phase3 -pl exercises/solutions/phase-03 -am verify
+sh ./mvnw -Psolution-phase3 -pl exercises/solutions/phase-03 -am verify
 ```
 
 정답도 starter의 동일 계약 테스트를 사용합니다. 테스트 결과와 DB 통합 결과를 혼합하지 말고 실제 실행 기록은 루트 `PROGRESS.md`에서 확인합니다.

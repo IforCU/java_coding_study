@@ -1,5 +1,7 @@
 # Phase 3 — 단계별 힌트
 
+JSTL 화면 작성 힌트는 [화면 실습 힌트](jstl/hints.md)에 따로 있습니다.
+
 ## 1. Mapper 연결 이름 확인
 
 namespace는 인터페이스의 전체 이름이고 statement ID는 메서드 이름과 연결됩니다. XML이 문법적으로 유효해도 이름이 다르면 필요한 statement를 찾지 못할 수 있습니다.

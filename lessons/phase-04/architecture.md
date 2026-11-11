@@ -1,5 +1,7 @@
 # Phase 4 — 이체 처리와 DB 경계
 
+화면 보조 과제의 데이터와 실행 경계는 [JSTL 구조](jstl/architecture.md)를 참고하세요. 본편 애플리케이션 구성은 유지합니다.
+
 ```mermaid
 flowchart TD
     Browser[브라우저 / CSRF 폼] --> Controller[이체 Controller]

@@ -2,6 +2,8 @@
 
 ## 진행 원칙
 
+2026-11-11 Phase 2~6 안내 갱신: 본편·실습·정답의 로컬 Maven 명령을 Windows/POSIX Wrapper로 통일한다. 기존 Phase 2 계좌 JSP 과제는 유지하고, Phase 3 거래 검색·Phase 4 이체 상태·Phase 5 감사 표시·Phase 6 API 응답 표시 과제를 기존 선택형 JSP lab에 추가한다. 본편 WAR/JAR와 기본 빌드는 보존하며 각 단계 starter/정답·교재 5종·HTTP 계약을 분리한다. 로컬 검증 후 관련 커밋만 main에 cherry-pick하고 phase-02로 복귀한다. Docker 통합은 대기로 기록한다.
+
 2026-11-11 JSP/JSTL 보조 실습: Phase 2에 DB 없는 계좌 화면 TODO와 5종 교재를 추가한다. Java 17 / Jakarta Servlet 6 / Tomcat 10.1 / Jakarta Tags 3을 사용하고, `jstl-lab` 선택 프로필로 기본 빌드와 분리한다. 가상 BigDecimal 계좌 데이터는 Servlet이 전달하며 JSP는 반복·필터·조건·형식화·안전한 출력을 담당한다. starter/정답은 분리하고 실제 내장 Tomcat HTTP 계약 검사로 검증한다. Docker 검증은 대기로 유지한다.
 
 2026-11-11 Maven Wrapper 추가: Maven 3.10.0을 프로젝트 Wrapper로 고정하고 로컬 검증 스크립트가 우선 사용한다. 전역 Maven 설치 없이 JDK와 인터넷 연결로 시작하며, 배포본·의존성·임시 파일은 프로젝트 내부 `.cache`에 둔다. Phase 1 실행 안내도 Wrapper 기준으로 제공한다.

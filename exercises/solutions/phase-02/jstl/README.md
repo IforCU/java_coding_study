@@ -14,7 +14,7 @@
 .\mvnw.cmd -f exercises/jstl-bank-lab/pom.xml -Pjstl-solution test-compile exec:java
 ```
 
-Linux/macOS는 `sh ./mvnw`를 사용합니다. 정답 프로필은 `jstl-bank-lab-solution.war`, starter는 `jstl-bank-lab-starter.war`로 패키징되어 서로 분리됩니다. 루트 기본 빌드와 Compose 실습 이미지는 정답을 포함하지 않습니다.
+Linux/macOS는 `sh ./mvnw`를 사용합니다. 정답 프로필은 `jstl-bank-lab-02-solution.war`, starter는 `jstl-bank-lab-02-starter.war`로 패키징되어 서로 분리됩니다. 루트 기본 빌드와 Compose 실습 이미지는 정답을 포함하지 않습니다.
 
 ## 해설
 

@@ -6,8 +6,16 @@
 
 ## 로컬 빌드와 단위 테스트
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/02-servlet-jsp -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/02-servlet-jsp -am verify
+sh ./mvnw -pl modules/02-servlet-jsp -am verify
 ```
 
 기대 결과: Java 17 빌드와 단위 테스트가 성공하고 `modules/02-servlet-jsp/target/servlet-jsp.war`가 생성됩니다. WAR에는 정상 소스와 JSP만 포함되고 starter TODO, 정답, `legacy-customer.jsp.txt`가 들어가면 안 됩니다.
@@ -51,11 +59,19 @@ docker compose --profile phase2 ps -a
 
 ## 선택 실습
 
-```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase2 -pl exercises/starter/phase-02 -am verify
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase2 -pl exercises/starter/phase-02 -am verify
 ```
 
-미완성 TODO는 실패가 기대됩니다. 작성 후 null·공백·길이 경계·정규화 보존 테스트가 통과해야 합니다. 기본 `mvn -Dmaven.repo.local=.cache/maven-repository verify`는 실습을 선택하지 않습니다. 정답 비교 실행은 별도 solutions 안내를 확인합니다.
+Linux/macOS:
+
+```sh
+sh ./mvnw -Pexercise-phase2 -pl exercises/starter/phase-02 -am verify
+```
+
+미완성 TODO는 실패가 기대됩니다. 작성 후 null·공백·길이 경계·정규화 보존 테스트가 통과해야 합니다. 기본 `.\mvnw.cmd verify`는 실습을 선택하지 않습니다. 정답 비교 실행은 별도 solutions 안내를 확인합니다.
 
 ## 종료와 기록
 

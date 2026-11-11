@@ -10,8 +10,16 @@
 
 마스킹은 화면과 로그에 표시할 범위를 줄이는 정책입니다. 암호화, 인증·인가, 원본 데이터 보관 정책을 대신하지 않습니다. 값을 마스킹했더라도 SQL 값 바인딩과 출력 문맥의 이스케이프는 각각 유지합니다.
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Psolution-phase5 -pl exercises/solutions/phase-05 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Psolution-phase5 -pl exercises/solutions/phase-05 -am verify
+sh ./mvnw -Psolution-phase5 -pl exercises/solutions/phase-05 -am verify
 ```
 
 정답은 starter의 같은 계약 테스트를 사용합니다. 테스트 결과는 루트 `PROGRESS.md`에서 확인하며, 실제 웹·DB 검증과 분리해 기록합니다.
