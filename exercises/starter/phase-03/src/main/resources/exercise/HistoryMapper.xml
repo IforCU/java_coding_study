@@ -6,5 +6,8 @@
     WHERE 1 = 1
     <!-- TODO: 필수 accountId와 선택 from/to 검색 조건을 추가하세요. -->
     <!-- SQL 구조에 값을 직접 이어 붙이지 말고 MyBatis 바인딩을 사용합니다. -->
+    AND account_id = CAST(#{accountId} AS uuid)
+      <if test="from != null">AND occurred_at &gt;= #{from}</if>
+      <if test="to != null">AND occurred_at &lt; #{to}</if>
   </select>
 </mapper>
