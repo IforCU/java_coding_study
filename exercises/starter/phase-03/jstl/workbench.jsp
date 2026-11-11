@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<fmt:setLocale value="ko_KR"/>
 <!doctype html>
 <html lang="ko">
     <head>
@@ -43,16 +44,37 @@
                 TODO 4: 날짜는 fmt:formatDate pattern="yyyy-MM-dd HH:mm", timeZone="Asia/Seoul"로 표시한다.
                 TODO 5: id, type, memo는 c:out, amount는 fmt:formatNumber(number)와 '원'으로 표시한다.
                 TODO 6: 표시 건수가 0이면 id=empty-message에 '조회 내역이 없습니다.'를 출력한다. --%>
-                <p class="placeholder">JSTL로 아래 예시 행을 반복·조건 처리하고 데이터와 결과 문구를 완성하세요.</p>
+                <c:set var="visibleCount" value="${0}"/>
                 <table>
-                    <caption>실습 결과</caption>
-                    <tbody>
-                        <tr class="record-row">
-                            <td>TODO</td>
+                    <caption>거래 내역</caption>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>종류</th>
+                            <th>메모</th>
+                            <th>시각</th>
+                            <th>금액</th>
                         </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${history}" var="entry">
+                            <c:if test="${(empty param.kind or entry.type eq param.kind) and fn:contains(fn:toLowerCase(entry.memo), fn:toLowerCase(fn:trim(param.q)))}">
+                                <c:set var="visibleCount" value="${visibleCount + 1}"/>    
+                                <tr class="record-row">
+                                    <td><c:out value="${entry.id}"/></td>
+                                    <td><c:out value="${entry.type}"/></td>
+                                    <td><c:out value="${entry.memo}"/></td>
+                                    <td><fmt:formatDate value="${entry.occurredAt}" pattern="yyyy-MM-dd HH:mm" timeZone="Asia/Seoul"/></td>
+                                    <td><fmt:formatNumber value="${entry.amount}" type="number" groupingUsed="true"/>원</td>
+                                </tr>
+                            </c:if>
+                        </c:forEach>
                     </tbody>
                 </table>
-                <p>표시 건수: <span id="record-count">TODO</span></p>
+                <p>표시 건수: <span id="record-count"><c:out value="${visibleCount}"/></span></p>
+                <c:if test="${visibleCount eq 0}">
+                    <p id="empty-message">조회 내역이 없습니다.</p>
+                </c:if>
             </section>
         </main>
     </body>
