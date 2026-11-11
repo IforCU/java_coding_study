@@ -12,9 +12,15 @@
 - 검증은 JDK 21에서 release 17 대상으로 수행했다. 실제 JDK 17, Linux/macOS 네이티브 실행, Docker 이미지 빌드·기동, 실제 DB·API 연동과 브라우저 시각 검토는 **NOT RUN / 대기**다. 이번 변경을 Docker/DB까지 전체 완료로 기록하지 않는다. 로컬 검증 뒤 사용자 지시에 따라 관련 변경을 커밋·main cherry-pick하고 phase-02로 복귀하며 Git push는 하지 않는다.
 
 ## Current Phase
+<<<<<<< HEAD
 **Phase 0~6 기준 구현·교재·실습 존재. 현재 Phase 1 학습 및 Maven Wrapper 도입. 로컬 기본 테스트 재검증 완료, 전체 Docker/DB 재검증은 대기.**
 
 ### 2026-11-11 로컬 동기화 (Asia/Seoul)
+=======
+**Phase 0~6 기준 구현 보존. JSP/JSTL 보조 실습 로컬 검증 완료, 해당 실습 Docker 검증 대기.**
+
+### 2026-11-11 JSP/JSTL 실습 추가
+>>>>>>> main
 
 #### 은행 JSP/JSTL 화면 보조 실습
 
@@ -29,6 +35,7 @@
 - **PASS:** `.\mvnw.cmd -o verify`, 기본 7모듈 171 tests, 실패·오류 0. 기본 reactor에 JSP 실습 모듈이 들어가지 않았음을 확인했다. `docker compose --profile jstl-lab config --quiet` 종료 코드 0과 `git diff --check`도 통과했다.
 - 실행 환경은 로컬 JDK 21 / release 17이다. 실제 JDK 17, Docker 이미지 빌드·기동 및 DB 통합은 **NOT RUN / 대기**이며 이번 실습 전체 Docker 완료로 표시하지 않는다. 화면은 HTTP 응답으로 검증했고 실제 브라우저의 시각 검토는 미실행이다. 로그는 `.cache/jstl-starter.log`, `jstl-contract.log`, `jstl-solution.log`, `jstl-regression.log`에 보관했다. 전역 설치·시스템 설정 변경·Git commit/push는 수행하지 않았다.
 
+<<<<<<< HEAD
 #### Maven Wrapper 도입
 
 - Apache 공식 `maven-wrapper-distribution:3.3.4:only-script`의 `mvnw`/`mvnw.cmd`와 `.mvn/wrapper/maven-wrapper.properties`를 추가했다. Maven은 기존 프로젝트와 동일한 3.10.0으로 고정했다. 공식 배포본 SHA-512를 대조한 후 SHA-256을 properties에 고정해 최초 Wrapper 다운로드 시 검증한다.
@@ -61,6 +68,9 @@
 - `powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-local.ps1 -Offline`: 종료 코드 **1**. 프로젝트 내부 Maven과 PATH Maven이 없어 빌드 진입 전 중단했다. PATH의 Java도 없다. Java 컴파일·테스트 결과는 **NOT RUN**이며 코드 실패로 판정하지 않는다.
 - 최소 조치: 로컬 검증에는 JDK 17과 프로젝트 내부 Maven, 의존성 캐시를 준비한다. Docker 검증 재개 시 Linux 엔진 접근 권한을 확인하고 doctor부터 재실행한다. 전역 설치·시스템 설정 변경은 하지 않았다.
 - 브랜치와 환경 확인 가이드를 `docs/development-workflow.md`에 추가했다. 이번 변경은 문서 동기화이며 애플리케이션 코드와 실습 정답은 수정하지 않았다.
+=======
+아래는 2026-10-25의 기존 검증 기록이다.
+>>>>>>> main
 
 기록일: 2026-10-25, Asia/Seoul. 초기 Docker 미준비 시 사용자가 **Docker 검증은 대기로 기록하고 나머지 코드·교재 구현 진행**을 선택하여 각 Phase의 로컬 검증을 순서대로 진행했다. 이후 엔진이 연결되어 대기했던 실제 컨테이너 검증도 완료했다. 전체 검증 스크립트는 23:26 KST 종료 코드 0이며, 웹 업무 시나리오와 일반 down/up 데이터 보존도 통과했다.
 
