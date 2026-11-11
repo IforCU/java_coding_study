@@ -1,5 +1,15 @@
 # Project Progress
 
+## 2026-11-11 JSP 줄바꿈과 들여쓰기
+
+- 저장소의 JSP 21개(정상 화면 11개, starter 5개, 정답 5개)를 읽고 블록별 줄바꿈과 4칸 들여쓰기를 적용했다. URL/EL/JSTL 태그와 속성을 그대로 보존했으며 금액 뒤 '원', 인사 문구, textarea 등 의미가 있는 인라인 출력은 함께 유지했다. 외부 Tomcat의 JSP는 수정하지 않았다.
+- 시작 시 `exercises/starter/phase-02/jstl/accounts.jsp`에 학습자가 작성 중인 변경이 있었다. 원본을 `.cache/jsp-format/user-accounts.jsp`와 전용 stash에 보관해 공통 서식 커밋에서 제외한다. main cherry-pick 후 phase-02에서 학습자 내용을 같은 서식으로 복원한다.
+- 모든 JSP를 대상으로 변경 전후 비공백 문자 일치와 태그·속성 문자열의 정확한 일치를 검사했다. 검사 정보와 원본은 `.cache/jsp-format/manifest.json`, `baseline`에 보관했다. 검사 도구는 프로젝트 캐시에만 두며 전역 설치하지 않았다.
+- **PASS:** 단계별 정답 `mvnw.cmd -o -f exercises/jstl-bank-lab/pom.xml`에 `jstl-solution` 및 해당 `jstl-phaseN` 프로필을 선택해 verify. Phase 2는 7개, Phase 3~6은 각각 5개로 총 27개 HTTP/Jasper 검사가 실패·오류·생략 없이 통과했다. 순번 검사의 두 정규식은 태그 사이 줄바꿈·공백을 허용하되 순번 1·2의 기대값은 유지했다.
+- **PASS:** `.\mvnw.cmd -o verify`, 기존 기본 7모듈 171개 테스트 통과. 관련 로그는 `.cache/jsp-format/phase0N-solution.log`, `default-regression.log`에 보관했다. 테스트는 로컬 JDK 21에서 release 17 대상으로 수행했다.
+- **PASS:** 각 단계 starter의 선택형 verify도 모두 성공했다. Phase 2 smoke 2개, Phase 3~6 smoke 각 1개를 실행했고 미완성 계약은 선택하지 않아 생략했다. 로그는 `.cache/jsp-format/phase0N-starter.log`에 있다.
+- 실제 JDK 17, Docker/DB 통합과 본편 웹 화면의 브라우저 시각 검토는 **NOT RUN / 대기**다. 본편 JSP는 정적 보존 검사와 WAR 빌드로 검증했고 실제 Jasper 렌더링은 실습 JSP 10개를 대상으로 한다. Git push는 하지 않는다.
+
 ## 2026-11-11 Phase 2~6 Wrapper·화면 과제 갱신
 
 - `phase-02`에서 작업을 시작했고 시작 시 작업 폴더는 깨끗했다. Phase 2~6 본편·실습·정답 문서의 전역 `mvn` 명령을 Windows `.\mvnw.cmd`와 POSIX `sh ./mvnw`로 교체했다. PowerShell의 `-D` 및 복수 `-P` 인자는 인용하고 기존 Docker 명령은 유지했다. 대상 문서에 전역 mvn 명령이 남지 않았음을 정적 검색으로 확인했다.

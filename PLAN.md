@@ -2,6 +2,8 @@
 
 ## 진행 원칙
 
+2026-11-11 JSP 가독성 정리: 저장소의 정상 화면·starter·정답 JSP 21개에 블록별 줄바꿈과 4칸 들여쓰기를 적용한다. 태그·속성·EL·문자열은 보존하고 줄바꿈에 의존하던 HTTP 검사만 공백을 허용하도록 정리한다. 작성 중인 학습자 답변은 별도 보관 후 복원하며 main에는 공통 서식 변경만 cherry-pick한다. Docker 검증은 대기로 유지한다.
+
 2026-11-11 Phase 2~6 안내 갱신: 본편·실습·정답의 로컬 Maven 명령을 Windows/POSIX Wrapper로 통일한다. 기존 Phase 2 계좌 JSP 과제는 유지하고, Phase 3 거래 검색·Phase 4 이체 상태·Phase 5 감사 표시·Phase 6 API 응답 표시 과제를 기존 선택형 JSP lab에 추가한다. 본편 WAR/JAR와 기본 빌드는 보존하며 각 단계 starter/정답·교재 5종·HTTP 계약을 분리한다. 로컬 검증 후 관련 커밋만 main에 cherry-pick하고 phase-02로 복귀한다. Docker 통합은 대기로 기록한다.
 
 2026-11-11 JSP/JSTL 보조 실습: Phase 2에 DB 없는 계좌 화면 TODO와 5종 교재를 추가한다. Java 17 / Jakarta Servlet 6 / Tomcat 10.1 / Jakarta Tags 3을 사용하고, `jstl-lab` 선택 프로필로 기본 빌드와 분리한다. 가상 BigDecimal 계좌 데이터는 Servlet이 전달하며 JSP는 반복·필터·조건·형식화·안전한 출력을 담당한다. starter/정답은 분리하고 실제 내장 Tomcat HTTP 계약 검사로 검증한다. Docker 검증은 대기로 유지한다.
