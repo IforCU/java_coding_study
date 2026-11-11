@@ -2,6 +2,9 @@
 set -eu
 project_root=$(CDPATH= cd -P "$(dirname "$0")/.." && pwd)
 cd "$project_root"
+if [ -f ./mvnw ]; then
+    exec sh ./mvnw -B -ntp "$@" verify
+fi
 mkdir -p .cache/java-home .cache/tmp
 export MAVEN_OPTS="${MAVEN_OPTS:-} -Duser.home=\"$project_root/.cache/java-home\" -Djava.io.tmpdir=\"$project_root/.cache/tmp\""
 # All extra arguments are passed as individual Maven arguments, e.g. -o or -pl modules/01-java-core -am.
