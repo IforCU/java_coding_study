@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<fmt:setLocale value="ko_KR"/>
 <!doctype html>
 <html lang="ko">
     <head>
@@ -42,16 +43,37 @@
                 TODO 4: id=record-count에 건수만 표시하고 허용된 0건이면 id=empty-message에 '감사 내역이 없습니다.'를 출력한다.
                 TODO 5: param.note는 id=note에서 c:out으로 출력한다.
                 화면 분기는 권한 검사가 아니다. demo는 서버 응답 재현용이며 실제 로그인/인가를 구현하지 않는다. --%>
-                <p class="placeholder">JSTL로 아래 예시 행을 반복·조건 처리하고 데이터와 결과 문구를 완성하세요.</p>
-                <table>
-                    <caption>실습 결과</caption>
-                    <tbody>
-                        <tr class="record-row">
-                            <td>TODO</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p>표시 건수: <span id="record-count">TODO</span></p>
+                <p id="note"><c:out value="${param.note}"/></p>
+                <c:choose>
+                        <c:when test="${not canViewAudit}">
+                            <p id="denied-message">감사 내역을 볼 수 없습니다.</p>
+                        </c:when>
+                        <c:otherwise>
+                            <table>
+                                <caption>감사 내역</caption>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>계좌</th>
+                                        <th>요청 ID</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${audit}" var="entry">
+                                        <tr class="record-row">
+                                            <td><c:out value="${entry.account}"/></td>
+                                            <td><c:out value="${entry.action}"/></td>
+                                            <td><c:out value="${entry.requestId}"/></td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                            <p>표시 건수: <span id="record-count"><c:out value="${fn:length(audit)}"/></span></p>
+                            <c:if test="${empty audit}">
+                                <p id="empty-message">감사 내역이 없습니다.</p>
+                            </c:if>
+                        </c:otherwise>
+                    </c:choose>
             </section>
         </main>
     </body>
