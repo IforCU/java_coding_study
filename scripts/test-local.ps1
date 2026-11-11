@@ -11,7 +11,10 @@ $PreviousOptions = $env:MAVEN_OPTS
 $TestExitCode = 1
 Push-Location $ProjectRoot
 try {
-    $MavenPath = Join-Path $ProjectRoot '.tools/apache-maven-3.10.0/bin/mvn.cmd'
+    $MavenPath = Join-Path $ProjectRoot 'mvnw.cmd'
+    if (-not (Test-Path -LiteralPath $MavenPath)) {
+        $MavenPath = Join-Path $ProjectRoot '.tools/apache-maven-3.10.0/bin/mvn.cmd'
+    }
     if (-not (Test-Path -LiteralPath $MavenPath)) {
         $MavenCommand = Get-Command mvn -ErrorAction SilentlyContinue
         if (-not $MavenCommand) { throw 'Maven is unavailable. Use the Docker test profile or install a project-local Maven distribution.' }
