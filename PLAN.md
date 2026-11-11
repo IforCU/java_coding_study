@@ -2,6 +2,8 @@
 
 ## 진행 원칙
 
+2026-11-11 JSP/JSTL 보조 실습: Phase 2에 DB 없는 계좌 화면 TODO와 5종 교재를 추가한다. Java 17 / Jakarta Servlet 6 / Tomcat 10.1 / Jakarta Tags 3을 사용하고, `jstl-lab` 선택 프로필로 기본 빌드와 분리한다. 가상 BigDecimal 계좌 데이터는 Servlet이 전달하며 JSP는 반복·필터·조건·형식화·안전한 출력을 담당한다. starter/정답은 분리하고 실제 내장 Tomcat HTTP 계약 검사로 검증한다. Docker 검증은 대기로 유지한다.
+
 2026-11-11 Maven Wrapper 추가: Maven 3.10.0을 프로젝트 Wrapper로 고정하고 로컬 검증 스크립트가 우선 사용한다. 전역 Maven 설치 없이 JDK와 인터넷 연결로 시작하며, 배포본·의존성·임시 파일은 프로젝트 내부 `.cache`에 둔다. Phase 1 실행 안내도 Wrapper 기준으로 제공한다.
 
 2026-11-11 로컬 동기화: Phase 0~6 기준 구현은 저장소에 존재하며, 현재 학습 브랜치는 `phase-00`이다. 아래 완료 기록은 2026-10-25의 이력이다. 현재 PC에서는 검증 산출물과 로컬 Maven이 없으므로 재현 완료로 간주하지 않는다. 다음 작업은 개발 환경 준비 → Phase 0 재검증 → Phase 0 SQL 실습이다. Docker 검증은 대기로 유지하며, 최신 실행 결과는 `PROGRESS.md`, 브랜치와 환경 확인법은 `docs/development-workflow.md`를 따른다.

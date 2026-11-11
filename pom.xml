@@ -62,6 +62,10 @@
   </build>
   <profiles>
     <profile>
+      <id>jstl-lab</id>
+      <modules><module>exercises/jstl-bank-lab</module></modules>
+    </profile>
+    <profile>
       <id>exercise-phase1</id>
       <modules><module>exercises/starter/phase-01</module></modules>
     </profile>

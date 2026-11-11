@@ -1,5 +1,7 @@
 # Phase 2 — 웹 요청과 JDBC의 경계
 
+DB 없는 화면 보조 실습은 [JSTL 실습 구조](jstl/architecture.md)를 참고합니다. 본문은 기존 DB 연결 정상 모듈의 구조입니다.
+
 ```mermaid
 flowchart LR
     Browser[브라우저] -->|127.0.0.1:8082| Servlet[web.BankServlet]

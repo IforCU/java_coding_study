@@ -1,0 +1,14 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: #f3f6fa; color: #192b43; font: 16px/1.7 sans-serif; }
+main { max-width: 1040px; margin: 40px auto; padding: 0 20px; }
+header { border-top: 5px solid #166b63; padding-top: 20px; }
+h1 { margin: 8px 0; } h2 { font-size: 21px; }
+.label { color: #166b63; font-weight: bold; } .muted { color: #56687b; }
+.panel { background: white; padding: 24px; border: 1px solid #dce3ec; border-radius: 12px; margin: 20px 0; }
+form { display: flex; gap: 16px; flex-wrap: wrap; align-items: end; }
+label { display: grid; gap: 5px; }
+input, select, button { padding: 9px 12px; font: inherit; border: 1px solid #b4c2d2; border-radius: 6px; }
+button { background: #166b63; color: white; cursor: pointer; } a { color: #166b63; }
+table { width: 100%; border-collapse: collapse; } th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5eaf0; }
+.table-wrap { overflow-x: auto; } .amount { text-align: right; white-space: nowrap; }
+.placeholder { border: 2px dashed #b4c2d2; padding: 20px; color: #56687b; }

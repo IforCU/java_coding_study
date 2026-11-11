@@ -115,6 +115,14 @@ sh scripts/verify-all.sh --restart --integration
 
 ## 학습자 실습
 
+화면도 직접 작성하려면 [은행 JSP/JSTL 실습](lessons/phase-02/jstl/lesson.md)을 진행하세요. Phase 1 뒤부터 DB 없이 계좌 목록, 종류 필터, 상태 분기, 원화 표시, 빈 목록과 HTML 이스케이프를 연습합니다.
+
+```powershell
+.\mvnw.cmd -f exercises/jstl-bank-lab/pom.xml test-compile exec:java
+```
+
+접속 주소는 `http://127.0.0.1:8087/accounts`입니다. 화면 TODO는 `exercises/starter/phase-02/jstl/accounts.jsp`에 있고 기본 빌드·업무 앱에는 포함되지 않습니다. 별도 Docker 실행은 교재의 `jstl-lab` 프로필 안내를 따릅니다.
+
 각 교재는 개념 → 기준 코드 흐름 → 과제 → 힌트 → 검증 순서입니다. `modules`는 정상 기준 구현, `exercises/starter`는 직접 작성할 TODO입니다. TODO와 정답은 기본 빌드·실행에 포함되지 않습니다.
 
 Phase 1~6 실습 테스트는 아래 명령에서 번호와 경로를 바꿔 실행합니다. 수정 전에는 계약 테스트가 실패하는 것이 정상입니다.

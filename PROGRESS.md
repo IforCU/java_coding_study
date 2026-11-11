@@ -5,6 +5,19 @@
 
 ### 2026-11-11 로컬 동기화 (Asia/Seoul)
 
+#### 은행 JSP/JSTL 화면 보조 실습
+
+- 사용자가 지정한 외부 Tomcat 9의 `jstl-shop.jsp`를 읽어 반복·필터·조건·금액·빈 목록 실습 형식을 확인했다. 외부 파일과 서버는 수정하지 않았다. 현재 작업 브랜치 `phase-01`에서 기존 학습 파일을 보존했다.
+- `exercises/jstl-bank-lab`에 DB 없는 조회용 Servlet과 선택형 WAR 모듈을 추가했다. `BigDecimal` 잔액과 마스킹된 가상 계좌 4개를 request attribute로 전달한다. starter는 `exercises/starter/phase-02/jstl/accounts.jsp`, 정답·해설은 `exercises/solutions/phase-02/jstl`에 분리했다. 정상 모듈과 기본 Maven reactor에 TODO/정답을 넣지 않았다.
+- Phase 2와 같은 Servlet 6.0 / Tomcat 10.1.61 / Jakarta Tags API 3.0.2 + 구현 3.0.1을 사용한다. 공식 Jakarta Tags 3.0 및 Tomcat Jasper 문서를 확인했으며 `javax.servlet`을 혼합하지 않았다. `lessons/phase-02/jstl`에 한국어 교재 5종을 작성하고 Phase 1/2 및 README에 진입 링크를 추가했다.
+- 루트 Maven `jstl-lab`, 모듈 `jstl-check` 프로필과 루트 Compose `jstl-lab` 서비스를 추가했다. Compose는 `127.0.0.1:${JSTL_LAB_PORT:-8087}`에 starter만 공개한다. Dockerfile 전용 ignore로 필요한 소스만 허용하고 정답을 복사하지 않는다. 기존 `.env`, DB, 컨테이너와 볼륨은 변경하지 않았다.
+- **PASS:** `.\mvnw.cmd -Pjstl-lab -pl exercises/jstl-bank-lab -am verify`. 실제 내장 Tomcat/Jasper HTTP 검사 2개 통과, 완성 계약 5개는 의도적으로 skipped. starter WAR 빌드 성공. WAR 내용을 검사해 starter TODO 포함, 정답/해설/JUnit/내장 Tomcat/테스트 클래스 제외를 확인했다.
+- **예상 실패 확인:** `.\mvnw.cmd -o -f exercises/jstl-bank-lab/pom.xml -Pjstl-check test`. 미완성 starter는 7개 중 smoke 2개 통과, 완성 동작 5개 실패, 오류·생략 0. 최초 `-Djstl.contract=true` 무인용 명령은 PowerShell 인자 해석으로 Maven 진입 단계에서 실패했으며, 인용에 의존하지 않는 `jstl-check` 프로필로 바꾸어 위 결과를 재현했다.
+- **PASS:** `.\mvnw.cmd -o -f exercises/jstl-bank-lab/pom.xml -Pjstl-solution verify`. 정답 JSP 실제 렌더링 계약 7개, 실패·오류·생략 0. 전체/종류별 목록, 금액·상태, 필터 후 순번, 두 종류의 빈 결과, 이름 공백·HTML 이스케이프, 생성 링크, WEB-INF 접근 차단을 확인했다. starter/정답은 WAR 이름과 전개 디렉터리도 분리한다.
+- **PASS:** `.\mvnw.cmd -f exercises/jstl-bank-lab/pom.xml test-compile exec:java`로 로컬 서버 시작 후 `http://127.0.0.1:8087/accounts`의 HTTP 200과 starter TODO를 확인했다. 검증 서버는 종료했고 8087 listener가 남지 않았음을 확인했다. 기존에 실행 중이던 다른 서버는 중지하지 않았다.
+- **PASS:** `.\mvnw.cmd -o verify`, 기본 7모듈 171 tests, 실패·오류 0. 기본 reactor에 JSP 실습 모듈이 들어가지 않았음을 확인했다. `docker compose --profile jstl-lab config --quiet` 종료 코드 0과 `git diff --check`도 통과했다.
+- 실행 환경은 로컬 JDK 21 / release 17이다. 실제 JDK 17, Docker 이미지 빌드·기동 및 DB 통합은 **NOT RUN / 대기**이며 이번 실습 전체 Docker 완료로 표시하지 않는다. 화면은 HTTP 응답으로 검증했고 실제 브라우저의 시각 검토는 미실행이다. 로그는 `.cache/jstl-starter.log`, `jstl-contract.log`, `jstl-solution.log`, `jstl-regression.log`에 보관했다. 전역 설치·시스템 설정 변경·Git commit/push는 수행하지 않았다.
+
 #### Maven Wrapper 도입
 
 - Apache 공식 `maven-wrapper-distribution:3.3.4:only-script`의 `mvnw`/`mvnw.cmd`와 `.mvn/wrapper/maven-wrapper.properties`를 추가했다. Maven은 기존 프로젝트와 동일한 3.10.0으로 고정했다. 공식 배포본 SHA-512를 대조한 후 SHA-256을 properties에 고정해 최초 Wrapper 다운로드 시 검증한다.
