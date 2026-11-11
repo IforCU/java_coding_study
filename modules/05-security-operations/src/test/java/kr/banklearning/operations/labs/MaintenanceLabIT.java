@@ -31,23 +31,36 @@ class MaintenanceLabIT {
         LabFixture fixture = createFixture("100", "200", "900");
         List<LabAccount> observed = new ArrayList<>();
         try (Connection connection = fixture.source().getConnection();
-             PreparedStatement statement = connection.prepareStatement(
-                     "SELECT id, owner_id, balance FROM phase5_lab.account "
-                             + "WHERE id IN (?, ?, ?) AND balance >= 0 ORDER BY id")) {
+                PreparedStatement statement =
+                        connection.prepareStatement(
+                                "SELECT id, owner_id, balance FROM phase5_lab.account "
+                                        + "WHERE id IN (?, ?, ?) AND balance >= 0 ORDER BY id")) {
             // 자체 fixture의 ID 범위는 지키지만 현재 사용자 owner_id 조건이 빠진 장애다.
             statement.setObject(1, fixture.first());
             statement.setObject(2, fixture.second());
             statement.setObject(3, fixture.other());
             try (ResultSet result = statement.executeQuery()) {
-                while (result.next()) observed.add(new LabAccount(result.getObject("id", UUID.class),
-                        result.getObject("owner_id", UUID.class), result.getBigDecimal("balance")));
+                while (result.next())
+                    observed.add(
+                            new LabAccount(
+                                    result.getObject("id", UUID.class),
+                                    result.getObject("owner_id", UUID.class),
+                                    result.getBigDecimal("balance")));
             }
         }
 
         assertEquals(3, observed.size());
-        assertEquals(2L, observed.stream().filter(account -> account.owner().equals(fixture.owner())).count());
-        assertTrue(observed.stream().anyMatch(account -> account.id().equals(fixture.other())
-                && !account.owner().equals(fixture.owner())));
+        assertEquals(
+                2L,
+                observed.stream()
+                        .filter(account -> account.owner().equals(fixture.owner()))
+                        .count());
+        assertTrue(
+                observed.stream()
+                        .anyMatch(
+                                account ->
+                                        account.id().equals(fixture.other())
+                                                && !account.owner().equals(fixture.owner())));
     }
 
     @Test
@@ -82,15 +95,20 @@ class MaintenanceLabIT {
         try (Connection connection = dataSource().getConnection()) {
             connection.setAutoCommit(false);
             try {
-                try (PreparedStatement budget = connection.prepareStatement("SET LOCAL statement_timeout = '100ms'")) {
+                try (PreparedStatement budget =
+                        connection.prepareStatement("SET LOCAL statement_timeout = '100ms'")) {
                     budget.execute();
                 }
                 try (PreparedStatement slow = connection.prepareStatement("SELECT pg_sleep(0.5)")) {
-                    SQLException cancelled = assertThrows(SQLException.class, () -> {
-                        try (ResultSet ignored = slow.executeQuery()) {
-                            throw new AssertionError("The lab slow query was not cancelled.");
-                        }
-                    });
+                    SQLException cancelled =
+                            assertThrows(
+                                    SQLException.class,
+                                    () -> {
+                                        try (ResultSet ignored = slow.executeQuery()) {
+                                            throw new AssertionError(
+                                                    "The lab slow query was not cancelled.");
+                                        }
+                                    });
                     assertEquals("57014", cancelled.getSQLState());
                 }
             } finally {
@@ -104,8 +122,12 @@ class MaintenanceLabIT {
     void wrongAutoCommitScopePersistsOnlyTheDebit() throws SQLException {
         LabFixture fixture = createFixture("1000", "100", "900");
 
-        SQLException injected = assertThrows(SQLException.class,
-                () -> LabAutoCommitRunner.debitThenFail(fixture.source(), fixture.first(), new BigDecimal("100")));
+        SQLException injected =
+                assertThrows(
+                        SQLException.class,
+                        () ->
+                                LabAutoCommitRunner.debitThenFail(
+                                        fixture.source(), fixture.first(), new BigDecimal("100")));
 
         assertEquals("L0001", injected.getSQLState());
         BigDecimal source = readBalance(fixture.source(), fixture.first());
@@ -117,8 +139,8 @@ class MaintenanceLabIT {
         // 부분 실패 결과는 가상 fixture에만 남긴다. 정상 앱 데이터나 seed는 변경하지 않는다.
     }
 
-    private static LabFixture createFixture(String firstBalance, String secondBalance, String otherBalance)
-            throws SQLException {
+    private static LabFixture createFixture(
+            String firstBalance, String secondBalance, String otherBalance) throws SQLException {
         DataSource source = dataSource();
         UUID owner = UUID.randomUUID();
         UUID otherOwner = UUID.randomUUID();
@@ -140,9 +162,11 @@ class MaintenanceLabIT {
         return new LabFixture(source, owner, first, second, other);
     }
 
-    private static void insertAccount(Connection connection, UUID id, UUID owner, String balance) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO phase5_lab.account (id, owner_id, balance) VALUES (?, ?, ?)")) {
+    private static void insertAccount(Connection connection, UUID id, UUID owner, String balance)
+            throws SQLException {
+        try (PreparedStatement statement =
+                connection.prepareStatement(
+                        "INSERT INTO phase5_lab.account (id, owner_id, balance) VALUES (?, ?, ?)")) {
             statement.setObject(1, id);
             statement.setObject(2, owner);
             statement.setBigDecimal(3, new BigDecimal(balance));
@@ -152,7 +176,9 @@ class MaintenanceLabIT {
 
     private static BigDecimal readBalance(DataSource source, UUID id) throws SQLException {
         try (Connection connection = source.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT balance FROM phase5_lab.account WHERE id = ?")) {
+                PreparedStatement statement =
+                        connection.prepareStatement(
+                                "SELECT balance FROM phase5_lab.account WHERE id = ?")) {
             statement.setObject(1, id);
             try (ResultSet result = statement.executeQuery()) {
                 assertTrue(result.next());
@@ -183,25 +209,31 @@ class MaintenanceLabIT {
     private static String requiredEnvironment(String key) {
         String value = System.getenv(key);
         if (value == null || value.isBlank()) {
-            throw new IllegalStateException("MaintenanceLabIT requires " + key
-                    + "; use the integration profile with the migrated local PostgreSQL database.");
+            throw new IllegalStateException(
+                    "MaintenanceLabIT requires "
+                            + key
+                            + "; use the integration profile with the migrated local PostgreSQL database.");
         }
         return value;
     }
 
     private record LabFixture(DataSource source, UUID owner, UUID first, UUID second, UUID other) {}
+
     private record LabAccount(UUID id, UUID owner, BigDecimal balance) {}
 
     private static final class LabAutoCommitRunner {
-        private static void debitThenFail(DataSource source, UUID account, BigDecimal amount) throws SQLException {
+        private static void debitThenFail(DataSource source, UUID account, BigDecimal amount)
+                throws SQLException {
             try (Connection connection = source.getConnection();
-                 PreparedStatement statement = connection.prepareStatement(
-                         "UPDATE phase5_lab.account SET balance = balance - ? WHERE id = ?")) {
+                    PreparedStatement statement =
+                            connection.prepareStatement(
+                                    "UPDATE phase5_lab.account SET balance = balance - ? WHERE id = ?")) {
                 assertTrue(connection.getAutoCommit());
                 statement.setBigDecimal(1, amount);
                 statement.setObject(2, account);
                 assertEquals(1, statement.executeUpdate());
-                throw new SQLException("Injected lab failure after an auto-committed debit.", "L0001");
+                throw new SQLException(
+                        "Injected lab failure after an auto-committed debit.", "L0001");
             }
         }
     }

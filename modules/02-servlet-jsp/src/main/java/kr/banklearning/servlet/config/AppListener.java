@@ -52,8 +52,11 @@ public final class AppListener implements ServletContextListener {
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
             if (driver.getClass().getClassLoader() == owner) {
-                try { DriverManager.deregisterDriver(driver); }
-                catch (SQLException exception) { /* 종료 과정에서 비밀정보를 기록하지 않는다. */ }
+                try {
+                    DriverManager.deregisterDriver(driver);
+                } catch (SQLException exception) {
+                    /* 종료 과정에서 비밀정보를 기록하지 않는다. */
+                }
             }
         }
     }

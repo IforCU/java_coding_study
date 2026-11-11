@@ -26,8 +26,10 @@ class DatabaseProbeTest {
         assertAll(
                 () -> assertEquals(1, jdbc.openCount),
                 () -> assertEquals(Boolean.TRUE, jdbc.readOnly),
-                () -> assertEquals("SELECT schema_version FROM bootstrap.app_metadata WHERE environment = ?",
-                        jdbc.sql),
+                () ->
+                        assertEquals(
+                                "SELECT schema_version FROM bootstrap.app_metadata WHERE environment = ?",
+                                jdbc.sql),
                 () -> assertFalse(jdbc.sql.contains("local-learning")),
                 () -> assertEquals(1, jdbc.parameterIndex),
                 () -> assertEquals("local-learning", jdbc.parameterValue),
@@ -42,8 +44,8 @@ class DatabaseProbeTest {
         JdbcStub jdbc = new JdbcStub();
         jdbc.rowPresent = false;
 
-        SQLException failure = assertThrows(SQLException.class,
-                () -> new DatabaseProbe(jdbc, 3).verify());
+        SQLException failure =
+                assertThrows(SQLException.class, () -> new DatabaseProbe(jdbc, 3).verify());
 
         assertAll(
                 () -> assertEquals("Bootstrap schema is not ready", failure.getMessage()),
@@ -57,8 +59,11 @@ class DatabaseProbeTest {
             JdbcStub jdbc = new JdbcStub();
             jdbc.schemaVersion = version;
 
-            SQLException failure = assertThrows(SQLException.class,
-                    () -> new DatabaseProbe(jdbc, 3).verify(), "schema version=" + version);
+            SQLException failure =
+                    assertThrows(
+                            SQLException.class,
+                            () -> new DatabaseProbe(jdbc, 3).verify(),
+                            "schema version=" + version);
 
             assertEquals("Bootstrap schema is not ready", failure.getMessage());
             assertEquals(List.of("result", "statement", "connection"), jdbc.closed);
@@ -70,8 +75,8 @@ class DatabaseProbeTest {
         JdbcStub jdbc = new JdbcStub();
         jdbc.openFailure = new SQLException("connection unavailable");
 
-        SQLException failure = assertThrows(SQLException.class,
-                () -> new DatabaseProbe(jdbc, 3).verify());
+        SQLException failure =
+                assertThrows(SQLException.class, () -> new DatabaseProbe(jdbc, 3).verify());
 
         assertSame(jdbc.openFailure, failure);
         assertEquals(1, jdbc.openCount);
@@ -83,8 +88,8 @@ class DatabaseProbeTest {
         JdbcStub jdbc = new JdbcStub();
         jdbc.prepareFailure = new SQLException("relation unavailable");
 
-        SQLException failure = assertThrows(SQLException.class,
-                () -> new DatabaseProbe(jdbc, 3).verify());
+        SQLException failure =
+                assertThrows(SQLException.class, () -> new DatabaseProbe(jdbc, 3).verify());
 
         assertSame(jdbc.prepareFailure, failure);
         assertEquals(List.of("connection"), jdbc.closed);
@@ -96,8 +101,8 @@ class DatabaseProbeTest {
         JdbcStub jdbc = new JdbcStub();
         jdbc.executeFailure = new SQLException("query timeout");
 
-        SQLException failure = assertThrows(SQLException.class,
-                () -> new DatabaseProbe(jdbc, 3).verify());
+        SQLException failure =
+                assertThrows(SQLException.class, () -> new DatabaseProbe(jdbc, 3).verify());
 
         assertSame(jdbc.executeFailure, failure);
         assertEquals(List.of("statement", "connection"), jdbc.closed);
@@ -109,8 +114,8 @@ class DatabaseProbeTest {
         JdbcStub jdbc = new JdbcStub();
         jdbc.readFailure = new SQLException("result unavailable");
 
-        SQLException failure = assertThrows(SQLException.class,
-                () -> new DatabaseProbe(jdbc, 3).verify());
+        SQLException failure =
+                assertThrows(SQLException.class, () -> new DatabaseProbe(jdbc, 3).verify());
 
         assertSame(jdbc.readFailure, failure);
         assertEquals(List.of("result", "statement", "connection"), jdbc.closed);
@@ -136,56 +141,87 @@ class DatabaseProbeTest {
         private SQLException executeFailure;
         private SQLException readFailure;
 
-        private final ResultSet result = proxy(ResultSet.class, (proxy, method, args) -> {
-            return switch (method.getName()) {
-                case "next" -> rowPresent;
-                case "getInt" -> {
-                    versionColumn = (String) args[0];
-                    versionReads++;
-                    if (readFailure != null) {
-                        throw readFailure;
-                    }
-                    yield schemaVersion;
-                }
-                case "close" -> { closed.add("result"); yield null; }
-                default -> throw new AssertionError("Unexpected ResultSet call: " + method.getName());
-            };
-        });
+        private final ResultSet result =
+                proxy(
+                        ResultSet.class,
+                        (proxy, method, args) -> {
+                            return switch (method.getName()) {
+                                case "next" -> rowPresent;
+                                case "getInt" -> {
+                                    versionColumn = (String) args[0];
+                                    versionReads++;
+                                    if (readFailure != null) {
+                                        throw readFailure;
+                                    }
+                                    yield schemaVersion;
+                                }
+                                case "close" -> {
+                                    closed.add("result");
+                                    yield null;
+                                }
+                                default ->
+                                        throw new AssertionError(
+                                                "Unexpected ResultSet call: " + method.getName());
+                            };
+                        });
 
-        private final PreparedStatement statement = proxy(PreparedStatement.class, (proxy, method, args) -> {
-            return switch (method.getName()) {
-                case "setString" -> {
-                    parameterIndex = (Integer) args[0];
-                    parameterValue = (String) args[1];
-                    yield null;
-                }
-                case "setQueryTimeout" -> { queryTimeout = (Integer) args[0]; yield null; }
-                case "executeQuery" -> {
-                    executeCount++;
-                    if (executeFailure != null) {
-                        throw executeFailure;
-                    }
-                    yield result;
-                }
-                case "close" -> { closed.add("statement"); yield null; }
-                default -> throw new AssertionError("Unexpected PreparedStatement call: " + method.getName());
-            };
-        });
+        private final PreparedStatement statement =
+                proxy(
+                        PreparedStatement.class,
+                        (proxy, method, args) -> {
+                            return switch (method.getName()) {
+                                case "setString" -> {
+                                    parameterIndex = (Integer) args[0];
+                                    parameterValue = (String) args[1];
+                                    yield null;
+                                }
+                                case "setQueryTimeout" -> {
+                                    queryTimeout = (Integer) args[0];
+                                    yield null;
+                                }
+                                case "executeQuery" -> {
+                                    executeCount++;
+                                    if (executeFailure != null) {
+                                        throw executeFailure;
+                                    }
+                                    yield result;
+                                }
+                                case "close" -> {
+                                    closed.add("statement");
+                                    yield null;
+                                }
+                                default ->
+                                        throw new AssertionError(
+                                                "Unexpected PreparedStatement call: "
+                                                        + method.getName());
+                            };
+                        });
 
-        private final Connection connection = proxy(Connection.class, (proxy, method, args) -> {
-            return switch (method.getName()) {
-                case "setReadOnly" -> { readOnly = (Boolean) args[0]; yield null; }
-                case "prepareStatement" -> {
-                    sql = (String) args[0];
-                    if (prepareFailure != null) {
-                        throw prepareFailure;
-                    }
-                    yield statement;
-                }
-                case "close" -> { closed.add("connection"); yield null; }
-                default -> throw new AssertionError("Unexpected Connection call: " + method.getName());
-            };
-        });
+        private final Connection connection =
+                proxy(
+                        Connection.class,
+                        (proxy, method, args) -> {
+                            return switch (method.getName()) {
+                                case "setReadOnly" -> {
+                                    readOnly = (Boolean) args[0];
+                                    yield null;
+                                }
+                                case "prepareStatement" -> {
+                                    sql = (String) args[0];
+                                    if (prepareFailure != null) {
+                                        throw prepareFailure;
+                                    }
+                                    yield statement;
+                                }
+                                case "close" -> {
+                                    closed.add("connection");
+                                    yield null;
+                                }
+                                default ->
+                                        throw new AssertionError(
+                                                "Unexpected Connection call: " + method.getName());
+                            };
+                        });
 
         @Override
         public Connection open() throws SQLException {
@@ -197,7 +233,8 @@ class DatabaseProbeTest {
         }
 
         private static <T> T proxy(Class<T> type, InvocationHandler handler) {
-            return type.cast(Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] {type}, handler));
+            return type.cast(
+                    Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] {type}, handler));
         }
     }
 }

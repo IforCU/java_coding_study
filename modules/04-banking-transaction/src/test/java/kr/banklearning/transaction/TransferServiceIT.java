@@ -44,20 +44,30 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  * 기존 행 삭제, 데이터 초기화, DDL을 수행하지 않는다.
  */
 class TransferServiceIT {
-    private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-10-25T03:00:00Z"), ZoneId.of("Asia/Seoul"));
+    private static final Clock CLOCK =
+            Clock.fixed(Instant.parse("2026-10-25T03:00:00Z"), ZoneId.of("Asia/Seoul"));
     private static final LocalDate BUSINESS_DATE = LocalDate.of(2026, 10, 25);
 
     @Test
-    void failureAfterDebitRollsBackBothBalancesRequestLedgerDailyUsageAndVersions() throws SQLException {
+    void failureAfterDebitRollsBackBothBalancesRequestLedgerDailyUsageAndVersions()
+            throws SQLException {
         Fixture fixture = createFixture("1000", "100", "1000");
         Snapshot before = snapshot(fixture);
         AtomicBoolean reachedDebit = new AtomicBoolean();
-        TransferService service = transactionalService(fixture, () -> {
-            reachedDebit.set(true);
-            assertEquals(money("900"), fixture.jdbc().queryForObject(
-                    "SELECT balance FROM phase4.account WHERE id = ?", BigDecimal.class, fixture.source()));
-            throw new IllegalStateException("Injected failure after debit.");
-        });
+        TransferService service =
+                transactionalService(
+                        fixture,
+                        () -> {
+                            reachedDebit.set(true);
+                            assertEquals(
+                                    money("900"),
+                                    fixture.jdbc()
+                                            .queryForObject(
+                                                    "SELECT balance FROM phase4.account WHERE id = ?",
+                                                    BigDecimal.class,
+                                                    fixture.source()));
+                            throw new IllegalStateException("Injected failure after debit.");
+                        });
         TransferCommand command = command(fixture, "100");
 
         assertThrows(IllegalStateException.class, () -> service.transfer(command));
@@ -79,7 +89,9 @@ class TransferServiceIT {
         assertEquals(outcomes.get(0).receipt(), outcomes.get(1).receipt());
         assertEquals("COMPLETED", outcomes.get(0).receipt().status());
         assertEquals(BUSINESS_DATE, outcomes.get(0).receipt().businessDate());
-        assertEquals(new Snapshot(money("875"), money("225"), 1, 1, money("125"), 1, 1, 2), snapshot(fixture));
+        assertEquals(
+                new Snapshot(money("875"), money("225"), 1, 1, money("125"), 1, 1, 2),
+                snapshot(fixture));
         assertLedgerPair(service, command);
         Snapshot completed = snapshot(fixture);
         List<LedgerEntry> ledger = service.ledger(command.requestId());
@@ -100,9 +112,17 @@ class TransferServiceIT {
 
         assertEquals(1L, outcomes.stream().filter(outcome -> outcome.failure() == null).count());
         assertEquals(1L, outcomes.stream().filter(outcome -> outcome.failure() != null).count());
-        assertEquals(409, outcomes.stream().filter(outcome -> outcome.failure() != null)
-                .findFirst().orElseThrow().failure().status());
-        assertEquals(new Snapshot(money("300"), money("800"), 1, 1, money("700"), 1, 1, 2), snapshot(fixture));
+        assertEquals(
+                409,
+                outcomes.stream()
+                        .filter(outcome -> outcome.failure() != null)
+                        .findFirst()
+                        .orElseThrow()
+                        .failure()
+                        .status());
+        assertEquals(
+                new Snapshot(money("300"), money("800"), 1, 1, money("700"), 1, 1, 2),
+                snapshot(fixture));
         assertTrue(snapshot(fixture).used().compareTo(money("800")) <= 0);
     }
 
@@ -111,12 +131,19 @@ class TransferServiceIT {
         Fixture fixture = createFixture("1000", "100", "1000");
         Snapshot before = snapshot(fixture);
         AtomicBoolean reachedDatabaseFailure = new AtomicBoolean();
-        TransferService service = transactionalService(fixture, () -> {
-            reachedDatabaseFailure.set(true);
-            // 같은 DataSource의 JdbcTemplate이 서비스 트랜잭션에 참여한다.
-            // 자기 fixture 계좌에서 CHECK 위반을 발생시켜 실제 DB 오류 경로를 검증한다.
-            fixture.jdbc().update("UPDATE phase4.account SET balance = ? WHERE id = ?", money("-1"), fixture.source());
-        });
+        TransferService service =
+                transactionalService(
+                        fixture,
+                        () -> {
+                            reachedDatabaseFailure.set(true);
+                            // 같은 DataSource의 JdbcTemplate이 서비스 트랜잭션에 참여한다.
+                            // 자기 fixture 계좌에서 CHECK 위반을 발생시켜 실제 DB 오류 경로를 검증한다.
+                            fixture.jdbc()
+                                    .update(
+                                            "UPDATE phase4.account SET balance = ? WHERE id = ?",
+                                            money("-1"),
+                                            fixture.source());
+                        });
         TransferCommand command = command(fixture, "100");
 
         assertThrows(DataAccessException.class, () -> service.transfer(command));
@@ -127,7 +154,8 @@ class TransferServiceIT {
     }
 
     @Test
-    void retryAfterCommittedResponseIsLostReturnsTheStoredReceiptWithoutNewMutations() throws SQLException {
+    void retryAfterCommittedResponseIsLostReturnsTheStoredReceiptWithoutNewMutations()
+            throws SQLException {
         Fixture fixture = createFixture("1000", "100", "1000");
         TransferService service = transactionalService(fixture, () -> {});
         TransferCommand command = command(fixture, "100");
@@ -142,7 +170,8 @@ class TransferServiceIT {
         assertEquals(stored, retry);
         assertEquals(committed, snapshot(fixture));
         assertEquals(ledger, service.ledger(command.requestId()));
-        assertEquals(new Snapshot(money("900"), money("200"), 1, 1, money("100"), 1, 1, 2), committed);
+        assertEquals(
+                new Snapshot(money("900"), money("200"), 1, 1, money("100"), 1, 1, 2), committed);
     }
 
     @Test
@@ -158,8 +187,16 @@ class TransferServiceIT {
         BankProblem daily = assertThrows(BankProblem.class, () -> service.transfer(exceeding));
         assertEquals("DAILY_LIMIT", daily.code());
         assertEquals(0L, requestCount(fixture, exceeding.requestId()));
-        BankProblem conflict = assertThrows(BankProblem.class, () -> service.transfer(new TransferCommand(
-                first.requestId(), first.sourceId(), first.destinationId(), money("101"))));
+        BankProblem conflict =
+                assertThrows(
+                        BankProblem.class,
+                        () ->
+                                service.transfer(
+                                        new TransferCommand(
+                                                first.requestId(),
+                                                first.sourceId(),
+                                                first.destinationId(),
+                                                money("101"))));
         assertEquals("REQUEST_CONFLICT", conflict.code());
         assertEquals(committed, snapshot(fixture));
 
@@ -172,11 +209,14 @@ class TransferServiceIT {
     }
 
     @Test
-    void oppositeDirectionConcurrentTransfersUseTheSameLockOrderWithoutLosingMoney() throws Exception {
+    void oppositeDirectionConcurrentTransfersUseTheSameLockOrderWithoutLosingMoney()
+            throws Exception {
         Fixture fixture = createFixture("1000", "1000", "1000");
         TransferService service = transactionalService(fixture, () -> {});
         TransferCommand forward = command(fixture, "100");
-        TransferCommand reverse = new TransferCommand(UUID.randomUUID(), fixture.destination(), fixture.source(), money("100"));
+        TransferCommand reverse =
+                new TransferCommand(
+                        UUID.randomUUID(), fixture.destination(), fixture.source(), money("100"));
 
         List<Outcome> outcomes = concurrently(service, forward, reverse);
 
@@ -187,17 +227,24 @@ class TransferServiceIT {
         assertEquals(2, state.sourceVersion());
         assertEquals(2, state.destinationVersion());
         assertEquals(money("100"), state.used());
-        assertEquals(money("100"), fixture.jdbc().queryForObject(
-                "SELECT used FROM phase4.daily_usage WHERE account_id = ? AND business_date = ?",
-                BigDecimal.class, fixture.destination(), BUSINESS_DATE));
+        assertEquals(
+                money("100"),
+                fixture.jdbc()
+                        .queryForObject(
+                                "SELECT used FROM phase4.daily_usage WHERE account_id = ? AND business_date = ?",
+                                BigDecimal.class,
+                                fixture.destination(),
+                                BUSINESS_DATE));
         assertEquals(4L, state.ledgerRows());
         assertLedgerPair(service, forward);
         assertLedgerPair(service, reverse);
     }
 
     private static TransferService transactionalService(Fixture fixture, FailureHook hook) {
-        TransferService target = new TransferService(new JdbcTransferRepository(fixture.dataSource()), CLOCK, hook);
-        DataSourceTransactionManager manager = new DataSourceTransactionManager(fixture.dataSource());
+        TransferService target =
+                new TransferService(new JdbcTransferRepository(fixture.dataSource()), CLOCK, hook);
+        DataSourceTransactionManager manager =
+                new DataSourceTransactionManager(fixture.dataSource());
         manager.setDefaultTimeout(12);
         TransactionInterceptor interceptor = new TransactionInterceptor();
         interceptor.setTransactionManager(manager);
@@ -211,7 +258,8 @@ class TransferServiceIT {
         return result;
     }
 
-    private static List<Outcome> concurrently(TransferService service, TransferCommand first, TransferCommand second)
+    private static List<Outcome> concurrently(
+            TransferService service, TransferCommand first, TransferCommand second)
             throws Exception {
         CyclicBarrier start = new CyclicBarrier(2);
         ExecutorService workers = Executors.newFixedThreadPool(2);
@@ -221,18 +269,25 @@ class TransferServiceIT {
             return List.of(left.get(20, TimeUnit.SECONDS), right.get(20, TimeUnit.SECONDS));
         } finally {
             workers.shutdownNow();
-            assertTrue(workers.awaitTermination(15, TimeUnit.SECONDS), "Concurrent transfer workers did not stop.");
+            assertTrue(
+                    workers.awaitTermination(15, TimeUnit.SECONDS),
+                    "Concurrent transfer workers did not stop.");
         }
     }
 
-    private static Outcome invokeAtBarrier(TransferService service, TransferCommand command, CyclicBarrier start)
+    private static Outcome invokeAtBarrier(
+            TransferService service, TransferCommand command, CyclicBarrier start)
             throws Exception {
         start.await(5, TimeUnit.SECONDS);
-        try { return new Outcome(service.transfer(command), null); }
-        catch (BankProblem failure) { return new Outcome(null, failure); }
+        try {
+            return new Outcome(service.transfer(command), null);
+        } catch (BankProblem failure) {
+            return new Outcome(null, failure);
+        }
     }
 
-    private static Fixture createFixture(String sourceBalance, String destinationBalance, String dailyLimit)
+    private static Fixture createFixture(
+            String sourceBalance, String destinationBalance, String dailyLimit)
             throws SQLException {
         PGSimpleDataSource source = dataSource();
         UUID customer = UUID.randomUUID();
@@ -241,8 +296,9 @@ class TransferServiceIT {
         try (Connection connection = source.getConnection()) {
             connection.setAutoCommit(false);
             try {
-                try (PreparedStatement statement = connection.prepareStatement(
-                        "INSERT INTO phase4.customer (id, name, status) VALUES (?, ?, 'ACTIVE')")) {
+                try (PreparedStatement statement =
+                        connection.prepareStatement(
+                                "INSERT INTO phase4.customer (id, name, status) VALUES (?, ?, 'ACTIVE')")) {
                     statement.setObject(1, customer);
                     statement.setString(2, "IT가상고객-" + customer);
                     assertEquals(1, statement.executeUpdate());
@@ -259,10 +315,12 @@ class TransferServiceIT {
         return new Fixture(source, new JdbcTemplate(source), sourceId, destinationId);
     }
 
-    private static void insertAccount(Connection connection, UUID id, UUID customerId, String balance, String limit)
+    private static void insertAccount(
+            Connection connection, UUID id, UUID customerId, String balance, String limit)
             throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO phase4.account (id, customer_id, balance, daily_limit, version) VALUES (?, ?, ?, ?, 0)")) {
+        try (PreparedStatement statement =
+                connection.prepareStatement(
+                        "INSERT INTO phase4.account (id, customer_id, balance, daily_limit, version) VALUES (?, ?, ?, ?, 0)")) {
             statement.setObject(1, id);
             statement.setObject(2, customerId);
             statement.setBigDecimal(3, money(balance));
@@ -291,49 +349,122 @@ class TransferServiceIT {
     private static String requiredEnvironment(String key) {
         String value = System.getenv(key);
         if (value == null || value.isBlank()) {
-            throw new IllegalStateException("TransferServiceIT requires " + key
-                    + "; run the integration profile against the migrated local PostgreSQL database.");
+            throw new IllegalStateException(
+                    "TransferServiceIT requires "
+                            + key
+                            + "; run the integration profile against the migrated local PostgreSQL database.");
         }
         return value;
     }
 
     private static Snapshot snapshot(Fixture fixture) {
         JdbcTemplate jdbc = fixture.jdbc();
-        BigDecimal sourceBalance = jdbc.queryForObject("SELECT balance FROM phase4.account WHERE id = ?", BigDecimal.class, fixture.source());
-        BigDecimal destinationBalance = jdbc.queryForObject("SELECT balance FROM phase4.account WHERE id = ?", BigDecimal.class, fixture.destination());
-        long sourceVersion = jdbc.queryForObject("SELECT version FROM phase4.account WHERE id = ?", Long.class, fixture.source());
-        long destinationVersion = jdbc.queryForObject("SELECT version FROM phase4.account WHERE id = ?", Long.class, fixture.destination());
-        BigDecimal used = jdbc.queryForObject("SELECT COALESCE(sum(used), 0) FROM phase4.daily_usage WHERE account_id = ? AND business_date = ?",
-                BigDecimal.class, fixture.source(), BUSINESS_DATE);
-        long usageRows = jdbc.queryForObject("SELECT count(*) FROM phase4.daily_usage WHERE account_id = ? AND business_date = ?",
-                Long.class, fixture.source(), BUSINESS_DATE);
-        long requestRows = jdbc.queryForObject("SELECT count(*) FROM phase4.transfer_request WHERE source_id = ?", Long.class, fixture.source());
-        long ledgerRows = jdbc.queryForObject("SELECT count(*) FROM phase4.ledger WHERE account_id IN (?, ?)", Long.class, fixture.source(), fixture.destination());
-        return new Snapshot(sourceBalance, destinationBalance, sourceVersion, destinationVersion, used, usageRows, requestRows, ledgerRows);
+        BigDecimal sourceBalance =
+                jdbc.queryForObject(
+                        "SELECT balance FROM phase4.account WHERE id = ?",
+                        BigDecimal.class,
+                        fixture.source());
+        BigDecimal destinationBalance =
+                jdbc.queryForObject(
+                        "SELECT balance FROM phase4.account WHERE id = ?",
+                        BigDecimal.class,
+                        fixture.destination());
+        long sourceVersion =
+                jdbc.queryForObject(
+                        "SELECT version FROM phase4.account WHERE id = ?",
+                        Long.class,
+                        fixture.source());
+        long destinationVersion =
+                jdbc.queryForObject(
+                        "SELECT version FROM phase4.account WHERE id = ?",
+                        Long.class,
+                        fixture.destination());
+        BigDecimal used =
+                jdbc.queryForObject(
+                        "SELECT COALESCE(sum(used), 0) FROM phase4.daily_usage WHERE account_id = ? AND business_date = ?",
+                        BigDecimal.class,
+                        fixture.source(),
+                        BUSINESS_DATE);
+        long usageRows =
+                jdbc.queryForObject(
+                        "SELECT count(*) FROM phase4.daily_usage WHERE account_id = ? AND business_date = ?",
+                        Long.class,
+                        fixture.source(),
+                        BUSINESS_DATE);
+        long requestRows =
+                jdbc.queryForObject(
+                        "SELECT count(*) FROM phase4.transfer_request WHERE source_id = ?",
+                        Long.class,
+                        fixture.source());
+        long ledgerRows =
+                jdbc.queryForObject(
+                        "SELECT count(*) FROM phase4.ledger WHERE account_id IN (?, ?)",
+                        Long.class,
+                        fixture.source(),
+                        fixture.destination());
+        return new Snapshot(
+                sourceBalance,
+                destinationBalance,
+                sourceVersion,
+                destinationVersion,
+                used,
+                usageRows,
+                requestRows,
+                ledgerRows);
     }
 
     private static long requestCount(Fixture fixture, UUID requestId) {
-        return fixture.jdbc().queryForObject("SELECT count(*) FROM phase4.transfer_request WHERE request_id = ?", Long.class, requestId);
+        return fixture.jdbc()
+                .queryForObject(
+                        "SELECT count(*) FROM phase4.transfer_request WHERE request_id = ?",
+                        Long.class,
+                        requestId);
     }
 
     private static void assertLedgerPair(TransferService service, TransferCommand command) {
         List<LedgerEntry> entries = service.ledger(command.requestId());
         assertEquals(2, entries.size());
-        assertEquals(1L, entries.stream().filter(entry -> entry.accountId().equals(command.sourceId())
-                && entry.type().equals("WITHDRAWAL") && entry.amount().compareTo(command.amount()) == 0).count());
-        assertEquals(1L, entries.stream().filter(entry -> entry.accountId().equals(command.destinationId())
-                && entry.type().equals("DEPOSIT") && entry.amount().compareTo(command.amount()) == 0).count());
+        assertEquals(
+                1L,
+                entries.stream()
+                        .filter(
+                                entry ->
+                                        entry.accountId().equals(command.sourceId())
+                                                && entry.type().equals("WITHDRAWAL")
+                                                && entry.amount().compareTo(command.amount()) == 0)
+                        .count());
+        assertEquals(
+                1L,
+                entries.stream()
+                        .filter(
+                                entry ->
+                                        entry.accountId().equals(command.destinationId())
+                                                && entry.type().equals("DEPOSIT")
+                                                && entry.amount().compareTo(command.amount()) == 0)
+                        .count());
     }
 
     private static TransferCommand command(Fixture fixture, String amount) {
-        return new TransferCommand(UUID.randomUUID(), fixture.source(), fixture.destination(), money(amount));
+        return new TransferCommand(
+                UUID.randomUUID(), fixture.source(), fixture.destination(), money(amount));
     }
 
-    private static BigDecimal money(String value) { return new BigDecimal(value); }
+    private static BigDecimal money(String value) {
+        return new BigDecimal(value);
+    }
 
-    private record Fixture(DataSource dataSource, JdbcTemplate jdbc, UUID source, UUID destination) {}
+    private record Fixture(
+            DataSource dataSource, JdbcTemplate jdbc, UUID source, UUID destination) {}
+
     private record Outcome(TransferReceipt receipt, BankProblem failure) {}
-    private record Snapshot(BigDecimal sourceBalance, BigDecimal destinationBalance,
-                            long sourceVersion, long destinationVersion, BigDecimal used,
-                            long usageRows, long requestRows, long ledgerRows) {}
+
+    private record Snapshot(
+            BigDecimal sourceBalance,
+            BigDecimal destinationBalance,
+            long sourceVersion,
+            long destinationVersion,
+            BigDecimal used,
+            long usageRows,
+            long requestRows,
+            long ledgerRows) {}
 }

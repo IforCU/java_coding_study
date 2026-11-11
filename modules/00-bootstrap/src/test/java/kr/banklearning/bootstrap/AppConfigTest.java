@@ -45,8 +45,8 @@ class AppConfigTest {
         String invalidUrl = "jdbc:mysql://db/bank?user=" + USER + "&password=" + PASSWORD;
         environment.put("DB_URL", invalidUrl);
 
-        IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
-                () -> AppConfig.from(environment));
+        IllegalArgumentException failure =
+                assertThrows(IllegalArgumentException.class, () -> AppConfig.from(environment));
 
         assertEquals("DB_URL must be a PostgreSQL JDBC URL", failure.getMessage());
         assertNoSecrets(failure.toString());
@@ -88,8 +88,11 @@ class AppConfigTest {
             Map<String, String> environment = validEnvironment();
             environment.put("DB_TIMEOUT_SECONDS", timeout);
 
-            IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
-                    () -> AppConfig.from(environment), "timeout=" + timeout);
+            IllegalArgumentException failure =
+                    assertThrows(
+                            IllegalArgumentException.class,
+                            () -> AppConfig.from(environment),
+                            "timeout=" + timeout);
 
             assertEquals("DB_TIMEOUT_SECONDS must be between 1 and 30", failure.getMessage());
             assertNoSecrets(failure.toString());
@@ -102,8 +105,8 @@ class AppConfigTest {
             Map<String, String> environment = validEnvironment();
             environment.put("DB_TIMEOUT_SECONDS", timeout);
 
-            IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
-                    () -> AppConfig.from(environment));
+            IllegalArgumentException failure =
+                    assertThrows(IllegalArgumentException.class, () -> AppConfig.from(environment));
 
             assertEquals("DB_TIMEOUT_SECONDS must be an integer", failure.getMessage());
             assertNoSecrets(failure.toString());
@@ -132,15 +135,14 @@ class AppConfigTest {
     }
 
     private static void assertRequiredFailure(Map<String, String> environment, String key) {
-        IllegalArgumentException failure = assertThrows(IllegalArgumentException.class,
-                () -> AppConfig.from(environment));
+        IllegalArgumentException failure =
+                assertThrows(IllegalArgumentException.class, () -> AppConfig.from(environment));
         assertEquals(key + " is required", failure.getMessage());
         assertNoSecrets(failure.toString());
     }
 
     private static void assertNoSecrets(String text) {
         assertAll(
-                () -> assertFalse(text.contains(USER)),
-                () -> assertFalse(text.contains(PASSWORD)));
+                () -> assertFalse(text.contains(USER)), () -> assertFalse(text.contains(PASSWORD)));
     }
 }

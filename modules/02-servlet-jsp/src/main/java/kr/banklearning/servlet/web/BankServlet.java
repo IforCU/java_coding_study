@@ -25,16 +25,21 @@ public final class BankServlet extends HttpServlet {
     private BankService bank;
 
     public BankServlet() {}
-    BankServlet(BankService bank) { this.bank = bank; }
+
+    BankServlet(BankService bank) {
+        this.bank = bank;
+    }
 
     @Override
     public void init() throws ServletException {
-        if (bank == null) bank = (BankService) getServletContext().getAttribute(AppListener.SERVICE);
+        if (bank == null)
+            bank = (BankService) getServletContext().getAttribute(AppListener.SERVICE);
         if (bank == null) throw new ServletException("학습 서비스를 초기화하지 못했습니다.");
     }
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-store");
@@ -51,7 +56,8 @@ public final class BankServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String path = request.getServletPath();
         if ("/health".equals(path)) {
             boolean ready = bank.ready();
@@ -75,7 +81,8 @@ public final class BankServlet extends HttpServlet {
             case "/accounts" -> {
                 String customerId = request.getParameter("customerId");
                 if (customerId == null) customerId = (String) session.getAttribute(SELECTED);
-                request.setAttribute(SELECTED, customerId == null || customerId.isBlank() ? null : customerId);
+                request.setAttribute(
+                        SELECTED, customerId == null || customerId.isBlank() ? null : customerId);
                 request.setAttribute("customers", bank.customers());
                 request.setAttribute("accounts", bank.accounts(customerId));
                 forward("accounts", request, response);
@@ -91,12 +98,16 @@ public final class BankServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         HttpSession session = request.getSession(false);
         String supplied = request.getParameter(CSRF);
         String expected = session == null ? null : (String) session.getAttribute(CSRF);
-        if (expected == null || supplied == null || !MessageDigest.isEqual(
-                expected.getBytes(StandardCharsets.UTF_8), supplied.getBytes(StandardCharsets.UTF_8))) {
+        if (expected == null
+                || supplied == null
+                || !MessageDigest.isEqual(
+                        expected.getBytes(StandardCharsets.UTF_8),
+                        supplied.getBytes(StandardCharsets.UTF_8))) {
             error(response, 403, "폼을 다시 열고 요청하세요.");
             return;
         }
@@ -137,12 +148,14 @@ public final class BankServlet extends HttpServlet {
         return token;
     }
 
-    private static void forward(String view, HttpServletRequest request, HttpServletResponse response)
+    private static void forward(
+            String view, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getRequestDispatcher("/WEB-INF/views/" + view + ".jsp").forward(request, response);
     }
 
-    private static void error(HttpServletResponse response, int status, String message) throws IOException {
+    private static void error(HttpServletResponse response, int status, String message)
+            throws IOException {
         response.setStatus(status);
         response.setContentType("text/plain");
         response.getWriter().write(message);

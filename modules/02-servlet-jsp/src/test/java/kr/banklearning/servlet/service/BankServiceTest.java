@@ -86,13 +86,40 @@ class BankServiceTest {
         final Map<UUID, CustomerView> customerRows = new LinkedHashMap<>();
         final Map<UUID, AccountView> accountRows = new LinkedHashMap<>();
         int historyCalls;
-        public List<CustomerView> customers() { return new ArrayList<>(customerRows.values()); }
-        public Optional<CustomerView> customer(UUID id) { return Optional.ofNullable(customerRows.get(id)); }
-        public void insertCustomer(CustomerView customer) { customerRows.put(customer.id(), customer); }
-        public List<AccountView> accounts(UUID id) { return accountRows.values().stream().filter(account -> id == null || id.equals(account.customerId())).toList(); }
-        public Optional<AccountView> account(UUID id) { return Optional.ofNullable(accountRows.get(id)); }
-        public void insertAccount(AccountView account) { accountRows.put(account.id(), account); }
-        public List<TransactionView> history(UUID id) { historyCalls++; return List.of(); }
-        public boolean ready() { return true; }
+
+        public List<CustomerView> customers() {
+            return new ArrayList<>(customerRows.values());
+        }
+
+        public Optional<CustomerView> customer(UUID id) {
+            return Optional.ofNullable(customerRows.get(id));
+        }
+
+        public void insertCustomer(CustomerView customer) {
+            customerRows.put(customer.id(), customer);
+        }
+
+        public List<AccountView> accounts(UUID id) {
+            return accountRows.values().stream()
+                    .filter(account -> id == null || id.equals(account.customerId()))
+                    .toList();
+        }
+
+        public Optional<AccountView> account(UUID id) {
+            return Optional.ofNullable(accountRows.get(id));
+        }
+
+        public void insertAccount(AccountView account) {
+            accountRows.put(account.id(), account);
+        }
+
+        public List<TransactionView> history(UUID id) {
+            historyCalls++;
+            return List.of();
+        }
+
+        public boolean ready() {
+            return true;
+        }
     }
 }

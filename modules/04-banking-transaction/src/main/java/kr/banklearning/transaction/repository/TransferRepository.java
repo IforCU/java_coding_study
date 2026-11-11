@@ -12,15 +12,26 @@ import kr.banklearning.transaction.domain.TransferReceipt;
 
 public interface TransferRepository {
     boolean reserve(TransferCommand command, LocalDate businessDate);
+
     Optional<TransferReceipt> findRequest(UUID requestId, boolean forUpdate);
+
     List<Account> lockAccounts(UUID sourceId, UUID destinationId);
+
     List<Account> accounts();
+
     BigDecimal dailyUsed(UUID accountId, LocalDate date);
+
     void setBalance(UUID accountId, BigDecimal balance);
+
     void setDailyUsed(UUID accountId, LocalDate date, BigDecimal amount);
+
     void appendLedger(LedgerEntry entry);
+
     List<LedgerEntry> ledger(UUID requestId);
+
     void complete(UUID requestId);
+
     void markCancellationRequested(UUID requestId);
+
     boolean ready();
 }

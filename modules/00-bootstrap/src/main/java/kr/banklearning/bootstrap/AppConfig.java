@@ -30,8 +30,11 @@ public final class AppConfig {
         if (timeout < 1 || timeout > 30) {
             throw new IllegalArgumentException("DB_TIMEOUT_SECONDS must be between 1 and 30");
         }
-        return new AppConfig(url, required(environment, "DB_USER"),
-                required(environment, "DB_PASSWORD"), timeout);
+        return new AppConfig(
+                url,
+                required(environment, "DB_USER"),
+                required(environment, "DB_PASSWORD"),
+                timeout);
     }
 
     private static String required(Map<String, String> environment, String key) {
@@ -42,8 +45,19 @@ public final class AppConfig {
         return value;
     }
 
-    public String dbUrl() { return dbUrl; }
-    public String dbUser() { return dbUser; }
-    public String dbPassword() { return dbPassword; }
-    public int timeoutSeconds() { return timeoutSeconds; }
+    public String dbUrl() {
+        return dbUrl;
+    }
+
+    public String dbUser() {
+        return dbUser;
+    }
+
+    public String dbPassword() {
+        return dbPassword;
+    }
+
+    public int timeoutSeconds() {
+        return timeoutSeconds;
+    }
 }

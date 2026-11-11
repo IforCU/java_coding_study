@@ -1,5 +1,12 @@
 # Project Progress
 
+## 2026-11-11 본편 Java 줄바꿈과 들여쓰기
+
+- `phase-04`의 깨끗한 작업 폴더에서 시작했다. `modules`의 Java 113개를 읽고 Google Java Format 1.24.0의 AOSP 방식으로 4칸 들여쓰기를 적용했다. 기존 서식과 일치한 14개를 제외한 소스·테스트 99개가 변경됐다. import 정렬·삭제, 긴 문자열 재작성, Javadoc 재서식은 비활성화했다. 실습 starter/solutions는 수정하지 않았다.
+- **PASS:** `.cache/java-format/check.cjs`로 113개 파일의 변경 전후 코드 토큰과 문자열 리터럴이 동일함을 확인했다. 원본과 도구는 프로젝트 `.cache/java-format`에 보관하며 전역 설치·시스템 설정 변경은 하지 않았다.
+- **PASS:** `.\mvnw.cmd -o verify`, 기본 7모듈 171개 테스트 모두 통과, failures/errors/skipped 0. JDK 21에서 release 17로 빌드했다. 로그는 `.cache/java-format/verify.log`에 있다. `git diff --check`도 통과했다.
+- 실제 JDK 17 실행 및 Docker/DB 통합은 **NOT RUN / 대기**다. 서식 변경이므로 신규 테스트와 교재 내용 변경은 추가하지 않았다. 사용자 요청에 따라 서식·이 기록·계획 변경만 커밋해 main에 cherry-pick하고 phase-04로 복귀한다. 학습 커밋은 main에 포함하지 않으며 Git push는 하지 않는다.
+
 ## 2026-11-11 JSP 줄바꿈과 들여쓰기
 
 - 저장소의 JSP 21개(정상 화면 11개, starter 5개, 정답 5개)를 읽고 블록별 줄바꿈과 4칸 들여쓰기를 적용했다. URL/EL/JSTL 태그와 속성을 그대로 보존했으며 금액 뒤 '원', 인사 문구, textarea 등 의미가 있는 인라인 출력은 함께 유지했다. 외부 Tomcat의 JSP는 수정하지 않았다.

@@ -50,7 +50,9 @@ class BankServiceTest {
         assertEquals("학습고객01", customer.name());
         assertNotEquals(account.id(), second.id());
         assertEquals(2, bank.accountsOf(customer.id()).size());
-        assertTrue(bank.accountsOf(customer.id()).stream().allMatch(item -> item.customerId().equals(customer.id())));
+        assertTrue(
+                bank.accountsOf(customer.id()).stream()
+                        .allMatch(item -> item.customerId().equals(customer.id())));
         assertEquals(BigDecimal.ZERO, bank.getAccount(second.id()).balance());
         assertTrue(bank.history(second.id()).isEmpty());
     }
@@ -62,9 +64,11 @@ class BankServiceTest {
 
         assertEquals(new BigDecimal("65000"), bank.getAccount(account.id()).balance());
         List<TransactionView> history = bank.history(account.id());
-        assertEquals(List.of(TransactionType.DEPOSIT, TransactionType.WITHDRAWAL),
+        assertEquals(
+                List.of(TransactionType.DEPOSIT, TransactionType.WITHDRAWAL),
                 history.stream().map(TransactionView::type).toList());
-        assertEquals(List.of(new BigDecimal("100000"), new BigDecimal("65000")),
+        assertEquals(
+                List.of(new BigDecimal("100000"), new BigDecimal("65000")),
                 history.stream().map(TransactionView::balanceAfter).toList());
         assertEquals(new BigDecimal("35000"), history.get(1).amount());
         assertEquals(NOW, history.get(0).occurredAt());
@@ -99,7 +103,8 @@ class BankServiceTest {
     void insufficientFundsDoNotCreateTransactionAndExactBalanceCanBeWithdrawn() {
         bank.deposit(account.id(), new BigDecimal("100"));
         List<TransactionView> before = bank.history(account.id());
-        assertThrows(InsufficientFundsException.class,
+        assertThrows(
+                InsufficientFundsException.class,
                 () -> bank.withdraw(account.id(), new BigDecimal("101")));
         assertEquals(new BigDecimal("100"), bank.getAccount(account.id()).balance());
         assertEquals(before, bank.history(account.id()));
@@ -158,14 +163,15 @@ class BankServiceTest {
     void simultaneousWithdrawalsHaveOneWinnerAndOneRecordedWithdrawal() throws Exception {
         bank.deposit(account.id(), new BigDecimal("100"));
         ExecutorService executor = Executors.newFixedThreadPool(2);
-        Callable<Boolean> withdraw = () -> {
-            try {
-                bank.withdraw(account.id(), new BigDecimal("80"));
-                return true;
-            } catch (InsufficientFundsException exception) {
-                return false;
-            }
-        };
+        Callable<Boolean> withdraw =
+                () -> {
+                    try {
+                        bank.withdraw(account.id(), new BigDecimal("80"));
+                        return true;
+                    } catch (InsufficientFundsException exception) {
+                        return false;
+                    }
+                };
         try {
             List<Future<Boolean>> results = executor.invokeAll(List.of(withdraw, withdraw));
             int successes = 0;
