@@ -5,6 +5,12 @@
 
 ### 2026-11-11 로컬 동기화 (Asia/Seoul)
 
+#### 학습 답변 검토
+
+- 사용자 요청에 따라 `exercises/starter/phase-00/answer.md`의 원문을 보존하고 각 답변 아래 정정·보충 해설을 추가했다. 해설 위치는 이번 사용자의 명시적 파일 지정에 따랐다.
+- Phase 0의 Compose, POM, Dockerfile 및 Servlet/DB probe/설정/HTTP health helper 코드와 대조했다. HTTP와 JDBC 주소, live/ready, HTTP와 DB 타임아웃, 볼륨의 영속성, Java와 Servlet API 선택을 구분했다.
+- 문서 검토 작업으로 애플리케이션 코드와 실행 환경은 변경하지 않았다. Java/Docker 실행 테스트는 이번 범위에서 NOT RUN이며, 문서 변경은 `git diff --check`로 확인한다.
+
 #### 후속 점검: Phase 0 테이블 누락 문의
 
 - 일반 권한의 Docker 접근은 pipe 권한 오류였으나 승인된 샌드박스 외부 실행에서 프로젝트 컨테이너를 조회했다. `db`와 `legacy`는 healthy, `migrate`는 Exited (0)이었다. 현재 공개 포트는 PostgreSQL 5432, 웹 8080이다.
