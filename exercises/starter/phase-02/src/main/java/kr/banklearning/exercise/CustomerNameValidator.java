@@ -6,6 +6,15 @@ public final class CustomerNameValidator {
 
     public static String normalize(String name) {
         // TODO: 앞뒤 공백을 제거하고 1~80자 계약을 검증하세요.
-        throw new UnsupportedOperationException("TODO: 고객 이름 검증 구현");
+        if(name == null) {
+            throw new IllegalArgumentException("고객 이름은 1~80자여야 합니다.");
+        }
+
+        String nString = name.strip();
+        if(nString.isEmpty() || nString.length() > 80) {
+            throw new IllegalArgumentException("고객 이름은 1~80자여야 합니다.");
+        }
+
+        return nString;
     }
 }
