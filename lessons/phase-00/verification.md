@@ -97,6 +97,25 @@ sh scripts/verify-exercise.sh
 
 기대 결과: 테이블에서 읽은 두 열이 지정 순서로 한 행 반환되어 검증이 성공합니다. TODO를 작성하지 않은 starter는 실패해야 합니다. 정답 파일은 별도 정답 디렉터리에서 선택해서 실행합니다.
 
+### 테이블이 없다고 표시될 때
+
+`syntax error at or near "FROM"`은 테이블 누락이 아니라 SQL 문법 오류입니다. TODO의 주석은 실행할 때 무시되지만 주석 밖의 쉼표는 남습니다. SELECT의 마지막 결과 열 뒤에 쉼표가 남지 않도록 TODO 자리와 구분 기호를 함께 정리합니다. 주석 자체를 지울 필요는 없으며, 끝의 세미콜론도 문장 종료 위치에 하나만 둡니다.
+
+SQL 파일을 여는 것만으로 테이블이 만들어지지는 않습니다. `bootstrap.app_metadata`는 `database/migrations/V001__bootstrap.sql`을 `migrate` 서비스가 실행할 때 생성하며 초기 행은 `database/seed/R001__bootstrap.sql`이 넣습니다. 먼저 `docker compose --profile phase0 ps -a`에서 `db`의 healthy와 `migrate`의 `Exited (0)`를 확인합니다. DB healthy만으로 초기화 완료를 판단하지 않습니다.
+
+IDE나 DB 도구에서 오류가 발생한다면 이 프로젝트의 PostgreSQL에 연결했는지 확인합니다. 호스트는 `127.0.0.1`, 포트는 `.env`의 `POSTGRES_PORT`(미지정 시 5432), DB는 `POSTGRES_DB`(미지정 시 `bank_learning`)입니다. 컨테이너 내부의 `db:5432`는 IDE의 접속 주소와 다릅니다. 실제 공개 포트는 위 `ps -a`의 PORTS에서도 확인할 수 있습니다.
+
+연결한 DB에서 다음 진단 SQL을 실행합니다. 이는 실습 정답이 아니라 접속 위치와 테이블 존재 확인용입니다.
+
+```sql
+SELECT current_database(), current_user,
+       to_regclass('bootstrap.app_metadata') AS metadata_table;
+```
+
+`metadata_table`이 NULL이면 그 DB에서 테이블을 찾지 못한 것입니다. 접속 위치를 먼저 확인하고 migration 상태와 로그를 점검합니다. 접속이 맞고 초기화가 누락되었다면 `docker compose --profile phase0 run --rm migrate`로 migration과 seed를 재실행할 수 있습니다. 이 명령은 모든 단계의 초기화 SQL을 실행하며 기존 데이터를 삭제하지 않습니다. 오류가 나면 원인을 확인하고 볼륨을 삭제하거나 DB를 초기화하지 않습니다.
+
+테이블이 조회되고 실습 스크립트도 PASS하는데 IDE에만 경고가 남으면 SQL 파일에 연결된 데이터 소스를 선택하고 `bootstrap` 스키마를 탐색 대상으로 포함한 뒤 메타데이터를 새로고침합니다. `app_metadata`만 쓰면 기본 스키마에서 찾을 수 있으므로 과제에서 지정한 스키마 포함 이름을 사용합니다. IDE 경고와 실제 PostgreSQL 실행 오류는 구분해서 기록합니다.
+
 ## 7. 종료와 재현
 
 ```sh

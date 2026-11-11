@@ -2,6 +2,8 @@
 
 Java 요청이 JSP·Servlet·Service·SQL을 거치는 과정을 직접 추적하고 수정하는 로컬 은행 업무 학습 환경입니다. 메모리 은행에서 Spring MVC/MyBatis, 이체 트랜잭션, 보안·장애 분석, 별도 Spring Boot 조회 API까지 다룹니다. 모든 고객과 인증정보는 학습용 가상 데이터입니다.
 
+2026-11-11 로컬 점검에서는 Java/Maven 부재와 Docker 엔진 접근 거절로 재검증을 대기 중입니다. 아래 PASS는 2026-10-25의 기록이며 `artifacts` 로그는 현재 작업 폴더에 없습니다. 최신 상태는 [PROGRESS.md](PROGRESS.md), 브랜치 운영과 IDE·실행 환경 확인법은 [개발 가이드](docs/development-workflow.md)를 확인하세요.
+
 Phase 0~6의 코드·교재·실습과 실행 검증을 완료했습니다. 기본 테스트 171개와 정답 계약 테스트 79개가 통과했습니다.
 
 Docker 전체 이미지 빌드·웹 앱 6개 준비 상태·실제 PostgreSQL 통합 테스트 18개와 Phase 2~6 HTTP/JSP·폼 시나리오 5개를 통과했습니다. 마이그레이션/seed 재실행, DB·앱 재시작, 일반 종료(`down`) 후 재실행(`up`)의 데이터 보존도 확인했습니다.

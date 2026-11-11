@@ -4,10 +4,10 @@
 -- 결과 열은 environment, schema_version 순서여야 합니다.
 -- TODO를 실제 열, 테이블, 조건으로 바꾸세요. 상수로 결과를 흉내 내지 마세요.
 
-SELECT
-    /* TODO: 첫 번째 결과 열 */,
+SELECT environment, schema_version
+    /* TODO: 첫 번째 결과 열 */
     /* TODO: 두 번째 결과 열 */
-FROM
+FROM bootstrap.app_metadata
     /* TODO: 스키마를 포함한 테이블 이름 */
-WHERE
+WHERE environment = 'local-learning'
     /* TODO: 조회할 환경 조건 */;

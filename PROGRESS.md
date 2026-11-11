@@ -1,7 +1,25 @@
 # Project Progress
 
 ## Current Phase
-**Phase 0~6 구현·교재·실습과 로컬/Docker/PostgreSQL 검증 완료.**
+**Phase 0~6 기준 구현·교재·실습 존재. 현재 Phase 0 학습 준비 및 현 PC 재검증 대기.**
+
+### 2026-11-11 로컬 동기화 (Asia/Seoul)
+
+#### 후속 점검: Phase 0 테이블 누락 문의
+
+- 일반 권한의 Docker 접근은 pipe 권한 오류였으나 승인된 샌드박스 외부 실행에서 프로젝트 컨테이너를 조회했다. `db`와 `legacy`는 healthy, `migrate`는 Exited (0)이었다. 현재 공개 포트는 PostgreSQL 5432, 웹 8080이다.
+- 읽기 전용 조회로 `current_database() = bank_learning`, `current_user = bank_learning`, `to_regclass('bootstrap.app_metadata') = bootstrap.app_metadata` 및 실습용 메타데이터 행 존재를 확인했다.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/verify-exercise.ps1`: 종료 코드 **0 / PASS**. 현재 학습자가 작성한 starter SQL이 검증을 통과했다. 학습자 파일은 수정하지 않았다.
+- 사용자 후속 설명으로 최초 오류는 `syntax error at or near "FROM"`임을 확인했다. SELECT 열을 작성한 뒤 TODO 영역의 쉼표가 남아 다음 열을 요구한 문법 오류이며 테이블 누락이 아니다. 현재 파일은 해당 구분 기호가 정리되어 PASS한다.
+- Phase 0 verification에 TODO 구분 기호와 문법 오류 설명, 접속 DB·포트·스키마 확인 절차를 보완했다. migration 재실행, 데이터 변경·삭제, 컨테이너 재시작은 수행하지 않았다. 전체 Java 테스트·재시작·다른 Phase 검증은 이번 범위에서 NOT RUN이다.
+
+- `AGENTS.md`, `PLAN.md`, 이 문서, 루트 POM/Compose와 Phase 0 검증 절차를 대조했다. 아래 2026-10-25 PASS 표는 과거 기록이며 오늘 재실행한 결과가 아니다.
+- 점검 시작 시 작업 폴더는 깨끗했다. `phase-00`, `main`, 로컬 추적 참조 `origin/main`은 모두 `a773109`였다. 원격 fetch/pull/push는 수행하지 않았으므로 원격 최신 여부는 미확인이다.
+- `.env`는 존재하지만 `.tools`와 `artifacts`는 없다. 이들은 Git 제외 경로이므로 과거 로그와 도구가 새 작업 폴더에 자동 복원되지 않는다. 기존 `.env`는 변경하지 않았다. 문서의 15432/18084는 과거 환경 값이며 오늘의 적용 포트로 확인하지 않았다.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/doctor.ps1`: 종료 코드 **1**. Docker Compose CLI v5.6.1 확인 후 Linux 엔진 named pipe 연결이 `permission denied`로 실패했다. 현재 실행 권한에서 엔진에 접근할 수 없는 환경 문제이며 엔진 중지 여부는 단정하지 않는다. Compose 설정 및 HTTP/DB 검증은 **NOT RUN / 대기**다.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-local.ps1 -Offline`: 종료 코드 **1**. 프로젝트 내부 Maven과 PATH Maven이 없어 빌드 진입 전 중단했다. PATH의 Java도 없다. Java 컴파일·테스트 결과는 **NOT RUN**이며 코드 실패로 판정하지 않는다.
+- 최소 조치: 로컬 검증에는 JDK 17과 프로젝트 내부 Maven, 의존성 캐시를 준비한다. Docker 검증 재개 시 Linux 엔진 접근 권한을 확인하고 doctor부터 재실행한다. 전역 설치·시스템 설정 변경은 하지 않았다.
+- 브랜치와 환경 확인 가이드를 `docs/development-workflow.md`에 추가했다. 이번 변경은 문서 동기화이며 애플리케이션 코드와 실습 정답은 수정하지 않았다.
 
 기록일: 2026-10-25, Asia/Seoul. 초기 Docker 미준비 시 사용자가 **Docker 검증은 대기로 기록하고 나머지 코드·교재 구현 진행**을 선택하여 각 Phase의 로컬 검증을 순서대로 진행했다. 이후 엔진이 연결되어 대기했던 실제 컨테이너 검증도 완료했다. 전체 검증 스크립트는 23:26 KST 종료 코드 0이며, 웹 업무 시나리오와 일반 down/up 데이터 보존도 통과했다.
 
@@ -22,7 +40,7 @@
 - Docker 이미지 빌드, 전체 웹 준비 상태, JSP·폼 업무 시나리오, migration/seed 재실행, 재시작 및 일반 종료·재실행 검증.
 
 ## In Progress
-필수 구현과 검증에 남은 작업 없음. 학습용 컨테이너는 다시 실행해 둔 상태이며 TODO는 학습자가 직접 구현하도록 유지한다.
+현 PC의 빌드 및 Docker/DB 재검증은 위 최신 점검과 같이 대기 중이다. TODO는 학습자가 직접 구현하도록 유지한다. 아래 실행 상태와 PASS 표는 2026-10-25 기록이다.
 
 ## Verification
 
@@ -86,4 +104,4 @@ Maven 배포 ZIP은 SHA-512 확인 후 .tools에만 풀었고 Maven 캐시·임�
 powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/verify-all.ps1 -Restart -Integration
 ```
 
-또는 `sh scripts/verify-all.sh --restart --integration`을 사용한다. 현재 Hello World는 `http://127.0.0.1:8080/`, 이체 앱은 `http://127.0.0.1:18084/`에서 실행 중이다. 학습 종료 시 `docker compose --profile '*' down`으로 종료하며 DB 볼륨은 유지한다.
+또는 `sh scripts/verify-all.sh --restart --integration`을 사용한다. 과거 검증 당시 Hello World는 `http://127.0.0.1:8080/`, 이체 앱은 `http://127.0.0.1:18084/`에서 실행했다. 현재 실행 여부와 적용 포트는 재확인이 필요하다. 학습 종료 시 `docker compose --profile '*' down`으로 종료하며 DB 볼륨은 유지한다.
