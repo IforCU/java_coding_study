@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<fmt:setLocale value="ko_KR"/>
 <!doctype html>
 <html lang="ko">
     <head>
@@ -40,16 +41,57 @@
                 TODO 4: c:url/c:param으로 /workbench?id=해당ID 링크를 생성한다. class=detail-link로 둔다.
                 TODO 5: id는 c:out, amount는 fmt:formatNumber와 '원'으로 출력한다.
                 TODO 6: id=record-count에 표시 건수. 0건이면 id=empty-message에 '이체 내역이 없습니다.'를 출력한다. --%>
-                <p class="placeholder">JSTL로 아래 예시 행을 반복·조건 처리하고 데이터와 결과 문구를 완성하세요.</p>
+                <c:set var="visibleCount" value="${0}"/>
                 <table>
-                    <caption>실습 결과</caption>
-                    <tbody>
-                        <tr class="record-row">
-                            <td>TODO</td>
+                    <caption>이체 상태</caption>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>금액</th>
+                            <th>상태</th>
+                            <th>안내</th>
+                            <th>조회</th>
                         </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach items="${transfers}" var="transfer">
+                            <c:if test="${ empty param.status or transfer.status eq param.status}">
+                                <c:set var="visibleCount" value="${visibleCount + 1}"/>
+                                <c:url var="detailUrl" value="/workbench">
+                                    <c:param name="id" value="${transfer.id}"/>
+                                </c:url>
+                                <tr class="record-row">
+                                    <td><c:out value="${transfer.id}"/></td>
+                                    <td><fmt:formatNumber value="${transfer.amount}" type="number" groupingUsed="true"/>원</td>
+                                    <c:choose>
+                                        <c:when test="${transfer.status eq 'COMPLETED'}">
+                                            <td>완료</td>
+                                            <td>완료된 이체입니다.</td>
+                                        </c:when>
+                                        <c:when test="${transfer.status eq 'PENDING'}">
+                                            <td>처리 중</td>
+                                            <td>처리 결과 확인 전 재전송하지 마세요.</td>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <td>취소 요청</td>
+                                            <td>취소 요청은 환급 완료가 아닙니다.</td>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <td><a class="detail-link" href="<c:out value='${detailUrl}'/>">요청 ID 보기</a></td>
+                                </tr>
+                            </c:if>
+                        </c:forEach> 
+
+                        
                     </tbody>
                 </table>
-                <p>표시 건수: <span id="record-count">TODO</span></p>
+                <p>표시 건수: <span id="record-count"><c:out value="${visibleCount}"/></span></p>
+                <c:if test="${visibleCount eq 0}">
+                    <p id="empty-message">이체 내역이 없습니다.</p>
+                </c:if>
+                <c:if test="${not empty param.id}">
+                    <p id="select-id"><c:out value="${param.id}"/></p>
+                </c:if>
             </section>
         </main>
     </body>
