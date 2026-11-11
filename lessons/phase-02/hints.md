@@ -1,5 +1,7 @@
 # Phase 2 — 단계별 힌트
 
+계좌 화면 작성 TODO의 힌트는 [JSTL 실습 힌트](jstl/hints.md)에 따로 있습니다.
+
 ## 1. 네트워크 탭부터 관찰
 
 GET 화면이 보인 뒤 폼을 제출해 요청 두 개를 비교합니다. 첫 요청의 POST 본문과 응답의 `Location`, 이어지는 GET URL을 확인합니다. redirect 후 request attribute가 유지될 것이라고 가정하지 않습니다.

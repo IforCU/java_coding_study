@@ -36,3 +36,5 @@
 거래 시각을 매번 시스템 시각에서 직접 읽으면 정확한 결과를 단정하기 어렵습니다. `BankService`가 `Clock`을 받게 구성하여 테스트에서 고정 시각을 전달할 수 있습니다. Java 공식 문서도 테스트를 단순하게 만드는 용도로 대체 Clock을 설명합니다. [Java 17 Clock](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/Clock.html)
 
 코드를 읽은 뒤 [exercise.md](exercise.md)의 출금 가능 정책을 직접 구현합니다. 기준 프로젝트와 실습은 서로 다른 모듈입니다.
+
+Java 과제를 마친 뒤 화면도 직접 작성하려면 [은행 JSP/JSTL 실습](../phase-02/jstl/lesson.md)으로 이어갈 수 있습니다. DB 없이 계좌 목록과 금액·상태를 표시하는 화면을 연습합니다.

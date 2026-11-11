@@ -1,6 +1,14 @@
 name: ${COMPOSE_PROJECT_NAME:-bank-java-learning}
 
 services:
+  jstl-lab:
+    profiles: [jstl-lab]
+    build:
+      context: .
+      dockerfile: docker/jstl-lab/Dockerfile
+    ports:
+      - "127.0.0.1:${JSTL_LAB_PORT:-8087}:8080"
+
   db:
     image: postgres:17.11-bookworm
     profiles: [phase0, phase2, phase3, phase4, phase5, phase6, integration]

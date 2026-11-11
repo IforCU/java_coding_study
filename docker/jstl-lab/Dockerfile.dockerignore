@@ -1,0 +1,12 @@
+**
+!pom.xml
+!modules/
+!modules/**
+!exercises/
+!exercises/jstl-bank-lab/
+!exercises/jstl-bank-lab/**
+!exercises/starter/
+!exercises/starter/phase-02/
+!exercises/starter/phase-02/jstl/
+!exercises/starter/phase-02/jstl/**
+**/target/

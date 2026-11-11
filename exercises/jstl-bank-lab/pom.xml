@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent><groupId>kr.banklearning</groupId><artifactId>bank-java-learning</artifactId><version>1.0.0-SNAPSHOT</version><relativePath>../../pom.xml</relativePath></parent>
+  <artifactId>jstl-bank-lab</artifactId><packaging>war</packaging>
+  <properties>
+    <lab.views>${project.basedir}/../starter/phase-02/jstl</lab.views>
+    <jstl.contract>false</jstl.contract>
+    <lab.variant>starter</lab.variant>
+  </properties>
+  <dependencies>
+    <dependency><groupId>jakarta.servlet</groupId><artifactId>jakarta.servlet-api</artifactId><version>6.0.0</version><scope>provided</scope></dependency>
+    <dependency><groupId>jakarta.servlet.jsp.jstl</groupId><artifactId>jakarta.servlet.jsp.jstl-api</artifactId><version>3.0.2</version></dependency>
+    <dependency><groupId>org.glassfish.web</groupId><artifactId>jakarta.servlet.jsp.jstl</artifactId><version>3.0.1</version></dependency>
+    <dependency><groupId>org.apache.tomcat.embed</groupId><artifactId>tomcat-embed-core</artifactId><version>10.1.61</version><scope>test</scope></dependency>
+    <dependency><groupId>org.apache.tomcat.embed</groupId><artifactId>tomcat-embed-jasper</artifactId><version>10.1.61</version><scope>test</scope></dependency>
+    <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><scope>test</scope></dependency>
+  </dependencies>
+  <build><finalName>jstl-bank-lab-${lab.variant}</finalName><plugins>
+    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId></plugin>
+    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-war-plugin</artifactId><configuration>
+      <webappDirectory>${project.build.directory}/webapp-${lab.variant}</webappDirectory>
+      <webResources><resource><directory>${lab.views}</directory><targetPath>WEB-INF/views</targetPath><includes><include>*.jsp</include></includes></resource></webResources>
+    </configuration></plugin>
+    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><configuration><systemPropertyVariables>
+      <lab.module>${project.basedir}</lab.module><lab.views>${lab.views}</lab.views><jstl.contract>${jstl.contract}</jstl.contract>
+    </systemPropertyVariables></configuration></plugin>
+    <plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.5.0</version><configuration>
+      <mainClass>kr.banklearning.jsplab.LabServer</mainClass><classpathScope>test</classpathScope>
+      <systemProperties><systemProperty><key>lab.module</key><value>${project.basedir}</value></systemProperty><systemProperty><key>lab.views</key><value>${lab.views}</value></systemProperty></systemProperties>
+    </configuration></plugin>
+  </plugins></build>
+  <profiles>
+  <profile><id>jstl-check</id><properties><jstl.contract>true</jstl.contract></properties></profile>
+  <profile><id>jstl-solution</id><properties>
+    <lab.views>${project.basedir}/../solutions/phase-02/jstl</lab.views><jstl.contract>true</jstl.contract><lab.variant>solution</lab.variant>
+  </properties></profile></profiles>
+</project>
