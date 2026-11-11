@@ -10,9 +10,14 @@ import kr.banklearning.servlet.dto.BankViews.TransactionView;
 
 public final class BankService {
     private final BankDao dao;
-    public BankService(BankDao dao) { this.dao = dao; }
 
-    public List<CustomerView> customers() { return List.copyOf(dao.customers()); }
+    public BankService(BankDao dao) {
+        this.dao = dao;
+    }
+
+    public List<CustomerView> customers() {
+        return List.copyOf(dao.customers());
+    }
 
     public CustomerView createCustomer(String name) {
         if (name == null || name.isBlank() || name.strip().length() > 80) {
@@ -49,10 +54,14 @@ public final class BankService {
         return List.copyOf(dao.history(account.id()));
     }
 
-    public boolean ready() { return dao.ready(); }
+    public boolean ready() {
+        return dao.ready();
+    }
 
     public static UUID id(String value) {
-        if (value == null || !value.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")) {
+        if (value == null
+                || !value.matches(
+                        "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")) {
             throw new InputException("올바른 UUID 식별자를 입력하세요.");
         }
         return UUID.fromString(value);

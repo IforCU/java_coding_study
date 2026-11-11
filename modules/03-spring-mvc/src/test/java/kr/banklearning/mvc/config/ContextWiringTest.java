@@ -19,21 +19,36 @@ import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 class ContextWiringTest {
-    @Test void xmlRootAndAnnotationChildWireMapperServiceTransactionAndControllerWithoutDatabase() {
+    @Test
+    void xmlRootAndAnnotationChildWireMapperServiceTransactionAndControllerWithoutDatabase() {
         AtomicInteger connections = new AtomicInteger();
-        AbstractDataSource dataSource = new AbstractDataSource() {
-            @Override public Connection getConnection() throws SQLException { connections.incrementAndGet(); throw new SQLException("Test has no DB"); }
-            @Override public Connection getConnection(String username, String password) throws SQLException { return getConnection(); }
-        };
+        AbstractDataSource dataSource =
+                new AbstractDataSource() {
+                    @Override
+                    public Connection getConnection() throws SQLException {
+                        connections.incrementAndGet();
+                        throw new SQLException("Test has no DB");
+                    }
+
+                    @Override
+                    public Connection getConnection(String username, String password)
+                            throws SQLException {
+                        return getConnection();
+                    }
+                };
         try (GenericApplicationContext root = new GenericApplicationContext()) {
             new XmlBeanDefinitionReader(root).loadBeanDefinitions("classpath:root-context.xml");
             root.removeBeanDefinition("dataSource");
-            root.registerBeanDefinition("dataSource", new RootBeanDefinition(AbstractDataSource.class, () -> dataSource));
+            root.registerBeanDefinition(
+                    "dataSource",
+                    new RootBeanDefinition(AbstractDataSource.class, () -> dataSource));
             root.refresh();
             assertNotNull(root.getBean(BankMapper.class));
             assertTrue(AopUtils.isAopProxy(root.getBean(BankService.class)));
-            assertInstanceOf(DataSourceTransactionManager.class, root.getBean("transactionManager"));
-            try (AnnotationConfigWebApplicationContext child = new AnnotationConfigWebApplicationContext()) {
+            assertInstanceOf(
+                    DataSourceTransactionManager.class, root.getBean("transactionManager"));
+            try (AnnotationConfigWebApplicationContext child =
+                    new AnnotationConfigWebApplicationContext()) {
                 child.setParent(root);
                 child.setServletContext(new MockServletContext());
                 child.register(WebConfig.class);

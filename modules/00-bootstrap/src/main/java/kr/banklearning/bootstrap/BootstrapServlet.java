@@ -9,7 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet(urlPatterns = {"/health/live", "/health/ready"}, loadOnStartup = 1)
+@WebServlet(
+        urlPatterns = {"/health/live", "/health/ready"},
+        loadOnStartup = 1)
 public final class BootstrapServlet extends HttpServlet {
     private transient DatabaseProbe database;
     private transient JdbcConnectionFactory connections;
@@ -37,7 +39,8 @@ public final class BootstrapServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-store");
@@ -48,8 +51,10 @@ public final class BootstrapServlet extends HttpServlet {
         }
         try {
             database.verify();
-            response.getWriter().write("{\"status\":\"UP\",\"database\":\"UP\","
-                    + "\"environment\":\"local-learning\",\"schemaVersion\":1}");
+            response.getWriter()
+                    .write(
+                            "{\"status\":\"UP\",\"database\":\"UP\","
+                                    + "\"environment\":\"local-learning\",\"schemaVersion\":1}");
         } catch (SQLException exception) {
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             response.getWriter().write("{\"status\":\"DOWN\",\"database\":\"DOWN\"}");

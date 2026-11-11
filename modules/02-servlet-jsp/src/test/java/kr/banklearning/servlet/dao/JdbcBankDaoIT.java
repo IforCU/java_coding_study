@@ -36,15 +36,17 @@ class JdbcBankDaoIT {
             dao.insertCustomer(expected);
 
             assertEquals(expected, dao.customer(id).orElseThrow());
-            assertEquals(List.of(expected), dao.customers().stream()
-                    .filter(customer -> customer.id().equals(id)).toList());
+            assertEquals(
+                    List.of(expected),
+                    dao.customers().stream().filter(customer -> customer.id().equals(id)).toList());
             assertTrue(dao.customer(UUID.randomUUID()).isEmpty());
             assertTrue(dao.ready());
         }
     }
 
     @Test
-    void enforcesCustomerForeignKeyAndMapsOrderedHistoryWithExactAmountsAndInstants() throws SQLException {
+    void enforcesCustomerForeignKeyAndMapsOrderedHistoryWithExactAmountsAndInstants()
+            throws SQLException {
         try (TestTransaction transaction = openTransaction()) {
             Connection connection = transaction.connection();
             JdbcBankDao dao = transaction.dao();
@@ -62,7 +64,8 @@ class JdbcBankDaoIT {
             assertEquals(accountId, accounts.get(0).id());
             assertEquals(customerId, accounts.get(0).customerId());
             assertEquals(0, BigDecimal.ZERO.compareTo(accounts.get(0).balance()));
-            assertEquals(0, BigDecimal.ZERO.compareTo(dao.account(accountId).orElseThrow().balance()));
+            assertEquals(
+                    0, BigDecimal.ZERO.compareTo(dao.account(accountId).orElseThrow().balance()));
             assertTrue(dao.account(UUID.randomUUID()).isEmpty());
             assertTrue(dao.history(accountId).isEmpty());
 
@@ -70,8 +73,14 @@ class JdbcBankDaoIT {
             Savepoint beforeInvalidAccount = connection.setSavepoint();
             UUID orphanAccountId = UUID.randomUUID();
             try {
-                assertThrows(DataAccessException.class, () -> dao.insertAccount(
-                        new AccountView(orphanAccountId, UUID.randomUUID(), BigDecimal.ZERO)));
+                assertThrows(
+                        DataAccessException.class,
+                        () ->
+                                dao.insertAccount(
+                                        new AccountView(
+                                                orphanAccountId,
+                                                UUID.randomUUID(),
+                                                BigDecimal.ZERO)));
             } finally {
                 connection.rollback(beforeInvalidAccount);
                 connection.releaseSavepoint(beforeInvalidAccount);
@@ -85,8 +94,9 @@ class JdbcBankDaoIT {
             // 역순으로 저장해 DAO의 occurred_at 정렬을 실제 DB에서 확인한다.
             insertHistory(connection, secondHistoryId, accountId, "75", "200", secondTime);
             insertHistory(connection, firstHistoryId, accountId, "125", "125", firstTime);
-            try (PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE phase2.account SET balance = ? WHERE id = ?")) {
+            try (PreparedStatement statement =
+                    connection.prepareStatement(
+                            "UPDATE phase2.account SET balance = ? WHERE id = ?")) {
                 statement.setBigDecimal(1, new BigDecimal("200"));
                 statement.setObject(2, accountId);
                 assertEquals(1, statement.executeUpdate());
@@ -94,7 +104,8 @@ class JdbcBankDaoIT {
 
             List<TransactionView> history = dao.history(accountId);
             assertEquals(2, history.size());
-            assertEquals(List.of(firstHistoryId, secondHistoryId),
+            assertEquals(
+                    List.of(firstHistoryId, secondHistoryId),
                     history.stream().map(TransactionView::id).toList());
             assertEquals(accountId, history.get(0).accountId());
             assertEquals("DEPOSIT", history.get(0).type());
@@ -104,18 +115,29 @@ class JdbcBankDaoIT {
             assertEquals(0, new BigDecimal("200").compareTo(history.get(1).balanceAfter()));
             assertEquals(firstTime.toInstant(), history.get(0).occurredAt());
             assertEquals(secondTime.toInstant(), history.get(1).occurredAt());
-            assertEquals(0, new BigDecimal("200").compareTo(dao.account(accountId).orElseThrow().balance()));
+            assertEquals(
+                    0,
+                    new BigDecimal("200")
+                            .compareTo(dao.account(accountId).orElseThrow().balance()));
             assertTrue(dao.history(otherAccountId).isEmpty());
-            assertFalse(dao.accounts(otherCustomerId).stream().anyMatch(account -> account.id().equals(accountId)));
+            assertFalse(
+                    dao.accounts(otherCustomerId).stream()
+                            .anyMatch(account -> account.id().equals(accountId)));
         }
     }
 
-    private static void insertHistory(Connection connection, UUID id, UUID accountId,
-                                      String amount, String balanceAfter, OffsetDateTime occurredAt)
+    private static void insertHistory(
+            Connection connection,
+            UUID id,
+            UUID accountId,
+            String amount,
+            String balanceAfter,
+            OffsetDateTime occurredAt)
             throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO phase2.transaction_history "
-                        + "(id, account_id, type, amount, balance_after, occurred_at) VALUES (?, ?, ?, ?, ?, ?)")) {
+        try (PreparedStatement statement =
+                connection.prepareStatement(
+                        "INSERT INTO phase2.transaction_history "
+                                + "(id, account_id, type, amount, balance_after, occurred_at) VALUES (?, ?, ?, ?, ?, ?)")) {
             statement.setObject(1, id);
             statement.setObject(2, accountId);
             statement.setString(3, "DEPOSIT");
@@ -143,29 +165,38 @@ class JdbcBankDaoIT {
             connection = DriverManager.getConnection(url, properties);
         } catch (SQLException exception) {
             // URL에 자격 증명이 포함됐을 수 있으므로 접속 예외 원문은 출력하지 않는다.
-            throw new IllegalStateException("JdbcBankDaoIT could not connect. Check the local PostgreSQL environment.");
+            throw new IllegalStateException(
+                    "JdbcBankDaoIT could not connect. Check the local PostgreSQL environment.");
         }
         boolean configured = false;
         try {
             connection.setAutoCommit(false);
-            Connection borrowed = (Connection) Proxy.newProxyInstance(
-                    JdbcBankDaoIT.class.getClassLoader(), new Class<?>[] {Connection.class},
-                    (proxy, method, arguments) -> {
-                        if (method.getName().equals("close")) return null;
-                        try {
-                            return method.invoke(connection, arguments);
-                        } catch (InvocationTargetException exception) {
-                            throw exception.getCause();
-                        }
-                    });
-            DataSource source = (DataSource) Proxy.newProxyInstance(
-                    JdbcBankDaoIT.class.getClassLoader(), new Class<?>[] {DataSource.class},
-                    (proxy, method, arguments) -> {
-                        if (method.getName().equals("getConnection") && method.getParameterCount() == 0) {
-                            return borrowed;
-                        }
-                        throw new UnsupportedOperationException("Only transaction-bound getConnection() is supported.");
-                    });
+            Connection borrowed =
+                    (Connection)
+                            Proxy.newProxyInstance(
+                                    JdbcBankDaoIT.class.getClassLoader(),
+                                    new Class<?>[] {Connection.class},
+                                    (proxy, method, arguments) -> {
+                                        if (method.getName().equals("close")) return null;
+                                        try {
+                                            return method.invoke(connection, arguments);
+                                        } catch (InvocationTargetException exception) {
+                                            throw exception.getCause();
+                                        }
+                                    });
+            DataSource source =
+                    (DataSource)
+                            Proxy.newProxyInstance(
+                                    JdbcBankDaoIT.class.getClassLoader(),
+                                    new Class<?>[] {DataSource.class},
+                                    (proxy, method, arguments) -> {
+                                        if (method.getName().equals("getConnection")
+                                                && method.getParameterCount() == 0) {
+                                            return borrowed;
+                                        }
+                                        throw new UnsupportedOperationException(
+                                                "Only transaction-bound getConnection() is supported.");
+                                    });
             configured = true;
             return new TestTransaction(connection, new JdbcBankDao(source));
         } finally {
@@ -176,14 +207,17 @@ class JdbcBankDaoIT {
     private static String requiredEnvironment(String key) {
         String value = System.getenv(key);
         if (value == null || value.isBlank()) {
-            throw new IllegalStateException("JdbcBankDaoIT requires " + key
-                    + "; run the integration profile against the migrated local PostgreSQL database.");
+            throw new IllegalStateException(
+                    "JdbcBankDaoIT requires "
+                            + key
+                            + "; run the integration profile against the migrated local PostgreSQL database.");
         }
         return value;
     }
 
     /** DAO의 close는 빌린 프록시에만 적용하고 테스트가 실제 연결의 rollback/close를 소유한다. */
-    private record TestTransaction(Connection connection, JdbcBankDao dao) implements AutoCloseable {
+    private record TestTransaction(Connection connection, JdbcBankDao dao)
+            implements AutoCloseable {
         @Override
         public void close() throws SQLException {
             try {

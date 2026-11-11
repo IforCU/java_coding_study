@@ -7,8 +7,12 @@ import kr.banklearning.operations.domain.Profile;
 
 public interface ProfileRepository {
     Optional<Profile> findProfile(String username);
+
     int updateNote(String username, String note);
+
     void appendAudit(AuditEvent event);
+
     List<AuditEvent> recentAudit();
+
     boolean ready();
 }

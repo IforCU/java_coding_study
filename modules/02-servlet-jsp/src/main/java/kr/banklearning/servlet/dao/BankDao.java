@@ -9,11 +9,18 @@ import kr.banklearning.servlet.dto.BankViews.TransactionView;
 
 public interface BankDao {
     List<CustomerView> customers();
+
     Optional<CustomerView> customer(UUID id);
+
     void insertCustomer(CustomerView customer);
+
     List<AccountView> accounts(UUID customerId);
+
     Optional<AccountView> account(UUID id);
+
     void insertAccount(AccountView account);
+
     List<TransactionView> history(UUID accountId);
+
     boolean ready();
 }

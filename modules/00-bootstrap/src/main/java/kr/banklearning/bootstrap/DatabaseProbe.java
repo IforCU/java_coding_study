@@ -17,8 +17,9 @@ public final class DatabaseProbe {
     public void verify() throws SQLException {
         try (Connection connection = connections.open()) {
             connection.setReadOnly(true);
-            try (PreparedStatement statement = connection.prepareStatement(
-                    "SELECT schema_version FROM bootstrap.app_metadata WHERE environment = ?")) {
+            try (PreparedStatement statement =
+                    connection.prepareStatement(
+                            "SELECT schema_version FROM bootstrap.app_metadata WHERE environment = ?")) {
                 statement.setString(1, "local-learning");
                 statement.setQueryTimeout(timeoutSeconds);
                 try (ResultSet result = statement.executeQuery()) {

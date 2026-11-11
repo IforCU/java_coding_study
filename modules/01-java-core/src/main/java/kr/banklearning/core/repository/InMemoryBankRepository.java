@@ -55,16 +55,19 @@ public final class InMemoryBankRepository implements BankRepository {
         if (id == null) {
             throw new NotFoundException("계좌");
         }
-        return accounts.compute(id, (key, current) -> {
-            if (current == null) {
-                throw new NotFoundException("계좌");
-            }
-            Account next = update.apply(current);
-            if (next == null || !next.id().equals(current.id())
-                    || !next.customerId().equals(current.customerId())) {
-                throw new IllegalArgumentException("계좌 식별자와 소유자는 변경할 수 없습니다.");
-            }
-            return next;
-        });
+        return accounts.compute(
+                id,
+                (key, current) -> {
+                    if (current == null) {
+                        throw new NotFoundException("계좌");
+                    }
+                    Account next = update.apply(current);
+                    if (next == null
+                            || !next.id().equals(current.id())
+                            || !next.customerId().equals(current.customerId())) {
+                        throw new IllegalArgumentException("계좌 식별자와 소유자는 변경할 수 없습니다.");
+                    }
+                    return next;
+                });
     }
 }

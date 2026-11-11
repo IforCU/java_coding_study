@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public final class PoolFactory {
     private PoolFactory() {}
+
     public static HikariDataSource create() {
         try {
             HikariConfig config = new HikariConfig();
@@ -23,6 +24,7 @@ public final class PoolFactory {
             throw new IllegalStateException("학습용 DB 환경변수를 확인하세요.");
         }
     }
+
     private static String env(String name) {
         String value = System.getenv(name);
         if (value == null || value.isBlank()) throw new IllegalStateException("필수 환경변수가 없습니다.");

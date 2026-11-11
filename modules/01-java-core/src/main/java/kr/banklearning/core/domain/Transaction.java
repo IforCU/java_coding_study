@@ -5,8 +5,13 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-public record Transaction(UUID id, UUID accountId, TransactionType type,
-                          BigDecimal amount, BigDecimal balanceAfter, Instant occurredAt) {
+public record Transaction(
+        UUID id,
+        UUID accountId,
+        TransactionType type,
+        BigDecimal amount,
+        BigDecimal balanceAfter,
+        Instant occurredAt) {
     public Transaction {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(accountId, "accountId");

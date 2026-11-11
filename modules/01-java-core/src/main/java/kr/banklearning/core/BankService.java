@@ -41,13 +41,17 @@ public final class BankService {
     }
 
     public AccountView deposit(UUID accountId, BigDecimal amount) {
-        return view(repository.updateAccount(accountId,
-                account -> account.deposit(amount, UUID.randomUUID(), clock.instant())));
+        return view(
+                repository.updateAccount(
+                        accountId,
+                        account -> account.deposit(amount, UUID.randomUUID(), clock.instant())));
     }
 
     public AccountView withdraw(UUID accountId, BigDecimal amount) {
-        return view(repository.updateAccount(accountId,
-                account -> account.withdraw(amount, UUID.randomUUID(), clock.instant())));
+        return view(
+                repository.updateAccount(
+                        accountId,
+                        account -> account.withdraw(amount, UUID.randomUUID(), clock.instant())));
     }
 
     public AccountView getAccount(UUID accountId) {
@@ -56,13 +60,22 @@ public final class BankService {
 
     public List<AccountView> accountsOf(UUID customerId) {
         requireCustomer(customerId);
-        return repository.findAccountsByCustomer(customerId).stream().map(BankService::view).toList();
+        return repository.findAccountsByCustomer(customerId).stream()
+                .map(BankService::view)
+                .toList();
     }
 
     public List<TransactionView> history(UUID accountId) {
         return requireAccount(accountId).transactions().stream()
-                .map(transaction -> new TransactionView(transaction.id(), transaction.accountId(), transaction.type(),
-                        transaction.amount(), transaction.balanceAfter(), transaction.occurredAt()))
+                .map(
+                        transaction ->
+                                new TransactionView(
+                                        transaction.id(),
+                                        transaction.accountId(),
+                                        transaction.type(),
+                                        transaction.amount(),
+                                        transaction.balanceAfter(),
+                                        transaction.occurredAt()))
                 .toList();
     }
 

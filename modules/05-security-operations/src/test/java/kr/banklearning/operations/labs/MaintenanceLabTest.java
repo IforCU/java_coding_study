@@ -27,8 +27,12 @@ class MaintenanceLabTest {
         List<LabAccount> observed = LabSqlQuery.withoutOwnerCondition(List.of(mine, other), owner);
 
         assertEquals(2, observed.size());
-        assertTrue(observed.stream().anyMatch(account -> account.id().equals(other.id())
-                && !account.ownerId().equals(owner)));
+        assertTrue(
+                observed.stream()
+                        .anyMatch(
+                                account ->
+                                        account.id().equals(other.id())
+                                                && !account.ownerId().equals(owner)));
     }
 
     @Test
@@ -56,7 +60,8 @@ class MaintenanceLabTest {
     void autoCommitFixtureLeavesTheDebitAfterFailure() {
         LabBank bank = new LabBank(money("1000"), money("100"));
 
-        assertThrows(IllegalStateException.class, () -> bank.transferAsSeparateCommits(money("100")));
+        assertThrows(
+                IllegalStateException.class, () -> bank.transferAsSeparateCommits(money("100")));
 
         assertEquals(money("900"), bank.source);
         assertEquals(money("100"), bank.destination);
@@ -69,8 +74,9 @@ class MaintenanceLabTest {
         UUID principal = UUID.randomUUID();
         LabAccount other = new LabAccount(UUID.randomUUID(), UUID.randomUUID(), money("900"));
 
-        LabAccount exposed = LabAuthorization.findWithoutOwnershipCheck(
-                principal, other.id(), Map.of(other.id(), other));
+        LabAccount exposed =
+                LabAuthorization.findWithoutOwnershipCheck(
+                        principal, other.id(), Map.of(other.id(), other));
 
         assertEquals(other.id(), exposed.id());
         assertNotEquals(principal, exposed.ownerId());
@@ -113,38 +119,62 @@ class MaintenanceLabTest {
         assertNotEquals(money("500"), mapped.dailyLimit());
     }
 
-    private static BigDecimal money(String amount) { return new BigDecimal(amount); }
+    private static BigDecimal money(String amount) {
+        return new BigDecimal(amount);
+    }
+
     private record LabAccount(UUID id, UUID ownerId, BigDecimal balance) {}
+
     private record LabSession(UUID principal, Instant expiresAt) {}
+
     private record LabAccountView(BigDecimal balance, BigDecimal dailyLimit) {}
 
     private static final class LabSqlQuery {
-        private static List<LabAccount> withoutOwnerCondition(List<LabAccount> rows, UUID requestedOwner) {
+        private static List<LabAccount> withoutOwnerCondition(
+                List<LabAccount> rows, UUID requestedOwner) {
             return rows.stream().filter(row -> row.balance().signum() >= 0).toList();
         }
     }
 
     private static final class LabPool {
         private final Semaphore permits;
-        private LabPool(int size) { permits = new Semaphore(size); }
+
+        private LabPool(int size) {
+            permits = new Semaphore(size);
+        }
+
         private LabLease borrow() {
-            if (!permits.tryAcquire()) throw new IllegalStateException("Lab pool has no available lease.");
+            if (!permits.tryAcquire())
+                throw new IllegalStateException("Lab pool has no available lease.");
             return new LabLease(permits);
         }
-        private int available() { return permits.availablePermits(); }
+
+        private int available() {
+            return permits.availablePermits();
+        }
     }
 
     private static final class LabLease implements AutoCloseable {
         private final Semaphore permits;
         private boolean returned;
-        private LabLease(Semaphore permits) { this.permits = permits; }
-        @Override public void close() {
-            if (!returned) { returned = true; permits.release(); }
+
+        private LabLease(Semaphore permits) {
+            this.permits = permits;
+        }
+
+        @Override
+        public void close() {
+            if (!returned) {
+                returned = true;
+                permits.release();
+            }
         }
     }
 
     private static final class LabLeak {
-        private static void borrowWithoutReturning(LabPool pool) { pool.borrow(); }
+        private static void borrowWithoutReturning(LabPool pool) {
+            pool.borrow();
+        }
     }
 
     private static final class LabQueryCost {
@@ -159,14 +189,17 @@ class MaintenanceLabTest {
         private BigDecimal source;
         private BigDecimal destination;
         private int transferCount;
+
         private LabBank(BigDecimal source, BigDecimal destination) {
             this.source = source;
             this.destination = destination;
         }
+
         private void transferAsSeparateCommits(BigDecimal amount) {
             source = source.subtract(amount);
             throw new IllegalStateException("Lab failure after the first independent commit.");
         }
+
         private void transferWithoutRequestRegistry(UUID requestId, BigDecimal amount) {
             source = source.subtract(amount);
             destination = destination.add(amount);
@@ -175,8 +208,8 @@ class MaintenanceLabTest {
     }
 
     private static final class LabAuthorization {
-        private static LabAccount findWithoutOwnershipCheck(UUID principal, UUID accountId,
-                                                             Map<UUID, LabAccount> accounts) {
+        private static LabAccount findWithoutOwnershipCheck(
+                UUID principal, UUID accountId, Map<UUID, LabAccount> accounts) {
             return accounts.get(accountId);
         }
     }

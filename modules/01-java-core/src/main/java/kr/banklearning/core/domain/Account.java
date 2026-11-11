@@ -28,7 +28,12 @@ public final class Account {
 
     public Account deposit(BigDecimal amount, UUID transactionId, Instant occurredAt) {
         BigDecimal normalized = Won.positive(amount);
-        return record(TransactionType.DEPOSIT, normalized, balance.add(normalized), transactionId, occurredAt);
+        return record(
+                TransactionType.DEPOSIT,
+                normalized,
+                balance.add(normalized),
+                transactionId,
+                occurredAt);
     }
 
     public Account withdraw(BigDecimal amount, UUID transactionId, Instant occurredAt) {
@@ -36,18 +41,38 @@ public final class Account {
         if (balance.compareTo(normalized) < 0) {
             throw new InsufficientFundsException();
         }
-        return record(TransactionType.WITHDRAWAL, normalized, balance.subtract(normalized), transactionId, occurredAt);
+        return record(
+                TransactionType.WITHDRAWAL,
+                normalized,
+                balance.subtract(normalized),
+                transactionId,
+                occurredAt);
     }
 
-    private Account record(TransactionType type, BigDecimal amount, BigDecimal balanceAfter,
-                           UUID transactionId, Instant occurredAt) {
+    private Account record(
+            TransactionType type,
+            BigDecimal amount,
+            BigDecimal balanceAfter,
+            UUID transactionId,
+            Instant occurredAt) {
         List<Transaction> next = new ArrayList<>(transactions);
         next.add(new Transaction(transactionId, id, type, amount, balanceAfter, occurredAt));
         return new Account(id, customerId, balanceAfter, next);
     }
 
-    public UUID id() { return id; }
-    public UUID customerId() { return customerId; }
-    public BigDecimal balance() { return balance; }
-    public List<Transaction> transactions() { return transactions; }
+    public UUID id() {
+        return id;
+    }
+
+    public UUID customerId() {
+        return customerId;
+    }
+
+    public BigDecimal balance() {
+        return balance;
+    }
+
+    public List<Transaction> transactions() {
+        return transactions;
+    }
 }

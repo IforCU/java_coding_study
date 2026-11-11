@@ -43,7 +43,8 @@ class BankServletTest {
         Exchange exchange = new Exchange();
         exchange.method = "POST";
         exchange.parameters.put("name", "학습고객");
-        new BankServlet(new BankService(exchange.dao)).service(exchange.request(), exchange.response());
+        new BankServlet(new BankService(exchange.dao))
+                .service(exchange.request(), exchange.response());
         assertEquals(403, exchange.status);
         assertTrue(exchange.dao.customers.isEmpty());
         assertFalse(exchange.sessionCreated);
@@ -56,11 +57,14 @@ class BankServletTest {
         exchange.sessionCreated = true;
         exchange.sessionValues.put("csrfToken", "known-test-token");
         exchange.parameters.putAll(Map.of("csrfToken", "known-test-token", "name", "학습고객"));
-        new BankServlet(new BankService(exchange.dao)).service(exchange.request(), exchange.response());
+        new BankServlet(new BankService(exchange.dao))
+                .service(exchange.request(), exchange.response());
         assertEquals(303, exchange.status);
         assertEquals("/bank/customers", exchange.headers.get("Location"));
         assertEquals(1, exchange.dao.customers.size());
-        assertEquals(exchange.dao.customers.get(0).id().toString(), exchange.sessionValues.get("selectedCustomerId"));
+        assertEquals(
+                exchange.dao.customers.get(0).id().toString(),
+                exchange.sessionValues.get("selectedCustomerId"));
         assertNull(exchange.forward);
     }
 
@@ -81,7 +85,8 @@ class BankServletTest {
     void unavailableStoreReturns503WithoutInternalDetails() throws Exception {
         Exchange exchange = new Exchange();
         exchange.dao.fail = true;
-        new BankServlet(new BankService(exchange.dao)).service(exchange.request(), exchange.response());
+        new BankServlet(new BankService(exchange.dao))
+                .service(exchange.request(), exchange.response());
         assertEquals(503, exchange.status);
         assertFalse(exchange.body.toString().contains("jdbc:"));
         assertFalse(exchange.body.toString().contains("Exception"));
@@ -105,7 +110,8 @@ class BankServletTest {
     void unknownRouteReturns404() throws Exception {
         Exchange exchange = new Exchange();
         exchange.path = "/unknown";
-        new BankServlet(new BankService(exchange.dao)).service(exchange.request(), exchange.response());
+        new BankServlet(new BankService(exchange.dao))
+                .service(exchange.request(), exchange.response());
         assertEquals(404, exchange.status);
     }
 
@@ -113,14 +119,37 @@ class BankServletTest {
         final List<CustomerView> customers = new ArrayList<>();
         boolean fail;
         boolean ready = true;
-        public List<CustomerView> customers() { if (fail) throw new DataAccessException(); return customers; }
-        public Optional<CustomerView> customer(UUID id) { return customers.stream().filter(customer -> customer.id().equals(id)).findFirst(); }
-        public void insertCustomer(CustomerView customer) { customers.add(customer); }
-        public List<AccountView> accounts(UUID id) { return List.of(); }
-        public Optional<AccountView> account(UUID id) { return Optional.empty(); }
+
+        public List<CustomerView> customers() {
+            if (fail) throw new DataAccessException();
+            return customers;
+        }
+
+        public Optional<CustomerView> customer(UUID id) {
+            return customers.stream().filter(customer -> customer.id().equals(id)).findFirst();
+        }
+
+        public void insertCustomer(CustomerView customer) {
+            customers.add(customer);
+        }
+
+        public List<AccountView> accounts(UUID id) {
+            return List.of();
+        }
+
+        public Optional<AccountView> account(UUID id) {
+            return Optional.empty();
+        }
+
         public void insertAccount(AccountView account) {}
-        public List<TransactionView> history(UUID id) { return List.of(); }
-        public boolean ready() { return ready; }
+
+        public List<TransactionView> history(UUID id) {
+            return List.of();
+        }
+
+        public boolean ready() {
+            return ready;
+        }
     }
 
     private static final class Exchange {
@@ -135,57 +164,97 @@ class BankServletTest {
         boolean sessionCreated;
 
         HttpServletRequest request() {
-            return proxy(HttpServletRequest.class, (name, args) -> switch (name) {
-                case "getMethod" -> method;
-                case "getServletPath" -> path;
-                case "getContextPath" -> "/bank";
-                case "getParameter" -> parameters.get((String) args[0]);
-                case "getAttribute" -> attributes.get((String) args[0]);
-                case "setAttribute" -> { attributes.put((String) args[0], args[1]); yield null; }
-                case "getDateHeader" -> -1L;
-                case "getSession" -> {
-                    boolean create = args == null || args.length == 0 || (boolean) args[0];
-                    if (!create && !sessionCreated) yield null;
-                    sessionCreated = true;
-                    yield session();
-                }
-                case "getRequestDispatcher" -> {
-                    String destination = (String) args[0];
-                    yield proxy(RequestDispatcher.class, (operation, values) -> { if (operation.equals("forward")) forward = destination; return null; });
-                }
-                default -> null;
-            });
+            return proxy(
+                    HttpServletRequest.class,
+                    (name, args) ->
+                            switch (name) {
+                                case "getMethod" -> method;
+                                case "getServletPath" -> path;
+                                case "getContextPath" -> "/bank";
+                                case "getParameter" -> parameters.get((String) args[0]);
+                                case "getAttribute" -> attributes.get((String) args[0]);
+                                case "setAttribute" -> {
+                                    attributes.put((String) args[0], args[1]);
+                                    yield null;
+                                }
+                                case "getDateHeader" -> -1L;
+                                case "getSession" -> {
+                                    boolean create =
+                                            args == null || args.length == 0 || (boolean) args[0];
+                                    if (!create && !sessionCreated) yield null;
+                                    sessionCreated = true;
+                                    yield session();
+                                }
+                                case "getRequestDispatcher" -> {
+                                    String destination = (String) args[0];
+                                    yield proxy(
+                                            RequestDispatcher.class,
+                                            (operation, values) -> {
+                                                if (operation.equals("forward"))
+                                                    forward = destination;
+                                                return null;
+                                            });
+                                }
+                                default -> null;
+                            });
         }
 
         HttpSession session() {
-            return proxy(HttpSession.class, (name, args) -> switch (name) {
-                case "getAttribute" -> sessionValues.get((String) args[0]);
-                case "setAttribute" -> { sessionValues.put((String) args[0], args[1]); yield null; }
-                default -> null;
-            });
+            return proxy(
+                    HttpSession.class,
+                    (name, args) ->
+                            switch (name) {
+                                case "getAttribute" -> sessionValues.get((String) args[0]);
+                                case "setAttribute" -> {
+                                    sessionValues.put((String) args[0], args[1]);
+                                    yield null;
+                                }
+                                default -> null;
+                            });
         }
 
         HttpServletResponse response() {
-            return proxy(HttpServletResponse.class, (name, args) -> switch (name) {
-                case "setStatus" -> { status = (int) args[0]; yield null; }
-                case "setHeader" -> { headers.put((String) args[0], (String) args[1]); yield null; }
-                case "getWriter" -> new PrintWriter(body);
-                case "sendRedirect" -> { status = 302; headers.put("Location", (String) args[0]); yield null; }
-                default -> null;
-            });
+            return proxy(
+                    HttpServletResponse.class,
+                    (name, args) ->
+                            switch (name) {
+                                case "setStatus" -> {
+                                    status = (int) args[0];
+                                    yield null;
+                                }
+                                case "setHeader" -> {
+                                    headers.put((String) args[0], (String) args[1]);
+                                    yield null;
+                                }
+                                case "getWriter" -> new PrintWriter(body);
+                                case "sendRedirect" -> {
+                                    status = 302;
+                                    headers.put("Location", (String) args[0]);
+                                    yield null;
+                                }
+                                default -> null;
+                            });
         }
     }
 
-    @FunctionalInterface private interface Operation { Object apply(String method, Object[] args); }
+    @FunctionalInterface
+    private interface Operation {
+        Object apply(String method, Object[] args);
+    }
+
     @SuppressWarnings("unchecked")
     private static <T> T proxy(Class<T> type, Operation operation) {
-        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, (target, method, args) -> {
-            Object result = operation.apply(method.getName(), args);
-            if (result != null) return result;
-            if (method.getReturnType() == boolean.class) return false;
-            if (method.getReturnType() == int.class) return 0;
-            if (method.getReturnType() == long.class) return 0L;
-            return null;
-        });
+        return (T)
+                Proxy.newProxyInstance(
+                        type.getClassLoader(),
+                        new Class<?>[] {type},
+                        (target, method, args) -> {
+                            Object result = operation.apply(method.getName(), args);
+                            if (result != null) return result;
+                            if (method.getReturnType() == boolean.class) return false;
+                            if (method.getReturnType() == int.class) return 0;
+                            if (method.getReturnType() == long.class) return 0L;
+                            return null;
+                        });
     }
 }
