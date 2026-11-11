@@ -72,8 +72,8 @@ class AccountPageTest {
         assertFalse(deposit.contains("여행 적금"));
         String savings = page("?type=SAVINGS");
         assertEquals(2, rows(savings)); count(savings, "result-count", 2);
-        assertTrue(Pattern.compile("class=\"account-row\"><td>1</td>").matcher(savings).find());
-        assertTrue(Pattern.compile("class=\"account-row\"><td>2</td>").matcher(savings).find());
+        assertTrue(Pattern.compile("class=\"account-row\">\\s*<td>1</td>").matcher(savings).find());
+        assertTrue(Pattern.compile("class=\"account-row\">\\s*<td>2</td>").matcher(savings).find());
         assertFalse(savings.contains("생활비 통장"));
     }
 
