@@ -2,7 +2,7 @@
 
 Java 요청이 JSP·Servlet·Service·SQL을 거치는 과정을 직접 추적하고 수정하는 로컬 은행 업무 학습 환경입니다. 메모리 은행에서 Spring MVC/MyBatis, 이체 트랜잭션, 보안·장애 분석, 별도 Spring Boot 조회 API까지 다룹니다. 모든 고객과 인증정보는 학습용 가상 데이터입니다.
 
-2026-11-11 로컬 점검에서는 Java/Maven 부재와 Docker 엔진 접근 거절로 재검증을 대기 중입니다. 아래 PASS는 2026-10-25의 기록이며 `artifacts` 로그는 현재 작업 폴더에 없습니다. 최신 상태는 [PROGRESS.md](PROGRESS.md), 브랜치 운영과 IDE·실행 환경 확인법은 [개발 가이드](docs/development-workflow.md)를 확인하세요.
+2026-11-11 Maven Wrapper를 추가하고 로컬 기본 테스트 171개를 재검증했습니다(JDK 21, Java 17 대상 컴파일). Phase 0 SQL 실습 검증도 통과했습니다. 아래 Docker 전체 검증 PASS는 2026-10-25의 기록이며 당시 `artifacts` 로그는 현재 작업 폴더에 없습니다. 최신 상태는 [PROGRESS.md](PROGRESS.md), 브랜치 운영과 IDE·실행 환경 확인법은 [개발 가이드](docs/development-workflow.md)를 확인하세요.
 
 Phase 0~6의 코드·교재·실습과 실행 검증을 완료했습니다. 기본 테스트 171개와 정답 계약 테스트 79개가 통과했습니다.
 
@@ -62,13 +62,26 @@ docker compose --profile phase1 run --build --rm java-core
 
 ## 빌드·테스트
 
+JDK 17을 준비하면 Maven을 별도로 설치하지 않고 루트의 Maven Wrapper를 사용할 수 있습니다. Windows PowerShell에서는 다음처럼 실행합니다.
+
+```powershell
+.\mvnw.cmd -v
+.\mvnw.cmd verify
+# Phase 1 정상 모듈만 검증
+.\mvnw.cmd -pl modules/01-java-core -am verify
+```
+
+Linux/macOS에서는 `sh ./mvnw verify`를 사용합니다. 최초 실행은 인터넷에서 Maven 3.10.0을 내려받아 SHA-256을 검증하며, 이후 같은 배포본을 재사용합니다. Maven 배포본은 `.cache/maven-wrapper`, 의존성은 `.cache/maven-repository`, 임시 파일은 `.cache/tmp`에 저장됩니다. Wrapper가 JDK를 설치하지는 않습니다. 의존성과 배포본이 모두 준비된 뒤에는 `-o`로 오프라인 빌드할 수 있습니다.
+
+기존 `scripts/test-local.ps1`과 `scripts/test-local.sh`도 Wrapper를 우선 사용합니다. 공식 [Maven Wrapper 안내](https://maven.apache.org/tools/wrapper/)를 참고하세요.
+
 전체 기본 모듈의 단위/MVC/보안 테스트와 패키징:
 
 ```sh
 docker compose --profile test run --build --rm test
 ```
 
-Docker가 없어도 프로젝트 내부 Maven 또는 PATH의 Maven과 JDK 17이 있으면 로컬 검증할 수 있습니다.
+Docker가 없어도 JDK 17과 프로젝트 Maven Wrapper로 로컬 검증할 수 있습니다.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-local.ps1

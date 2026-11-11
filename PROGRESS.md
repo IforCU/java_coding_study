@@ -1,9 +1,20 @@
 # Project Progress
 
 ## Current Phase
-**Phase 0~6 기준 구현·교재·실습 존재. 현재 Phase 0 학습 준비 및 현 PC 재검증 대기.**
+**Phase 0~6 기준 구현·교재·실습 존재. 현재 Phase 1 학습 및 Maven Wrapper 도입. 로컬 기본 테스트 재검증 완료, 전체 Docker/DB 재검증은 대기.**
 
 ### 2026-11-11 로컬 동기화 (Asia/Seoul)
+
+#### Maven Wrapper 도입
+
+- Apache 공식 `maven-wrapper-distribution:3.3.4:only-script`의 `mvnw`/`mvnw.cmd`와 `.mvn/wrapper/maven-wrapper.properties`를 추가했다. Maven은 기존 프로젝트와 동일한 3.10.0으로 고정했다. 공식 배포본 SHA-512를 대조한 후 SHA-256을 properties에 고정해 최초 Wrapper 다운로드 시 검증한다.
+- 저장소 정책에 맞게 Wrapper에 프로젝트 캐시 설정을 추가했다. 배포본은 `.cache/maven-wrapper`, 의존성은 `.cache/maven-repository`, JVM 사용자 홈은 `.cache/java-home`, 임시 파일은 `.cache/tmp`에 둔다. Windows 설정은 SETLOCAL로 해당 프로세스에만 적용한다. Wrapper 파일의 줄바꿈은 `.gitattributes`로 지정했다.
+- `scripts/test-local.ps1`/`.sh`는 Wrapper를 우선 사용하고, Wrapper가 없을 때만 기존 로컬 Maven/PATH 방식을 사용한다. README, 개발 가이드, Phase 1 과제·검증 문서를 수정했다.
+- `.\mvnw.cmd -v`: **PASS / 종료 코드 0**, Maven 3.10.0 다운로드·체크섬 검증·실행 확인. 현 세션에서는 JDK 21 (`C:\Program Files\OpenJDK\jdk-21`)이 감지되었다. 앞선 Java 부재 기록과 달리 현재 환경에서는 실행 가능하다. Wrapper가 JDK를 설치하지는 않았다.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-local.ps1 -Module 01-java-core`: **PASS**, 20 tests, 실패·오류·생략 0.
+- 전체 `test-local.ps1 -Offline` 첫 시도는 미다운로드 `maven-war-plugin:3.5.1`로 의존성 해석 단계에서 실패했다. 코드 오류가 아니며, 이후 `powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-local.ps1`로 필요한 의존성을 받은 뒤 **BUILD SUCCESS / 종료 코드 0**, 7개 기본 모듈 171 tests, 실패·오류·생략 0을 확인했다. 결과는 각 모듈 `target/surefire-reports/TEST-*.xml`에 있다.
+- Git sh의 `sh ./scripts/test-local.sh -o -pl modules/01-java-core -am`: **PASS**, 20 tests. 초기 POSIX JVM 경로 인용 문제는 수정 후 재검증했다. POSIX 구문 및 PowerShell 파서 검사와 `git diff --check`도 통과했다.
+- 이번 실행은 JDK 21에서 `release 17`로 컴파일했다. 실제 JDK 17 실행, Linux/macOS 네이티브 실행, Docker/DB 통합, starter/정답 계약은 이번 변경에서 NOT RUN이다. 전역 설치·환경 설정 변경·Git push는 수행하지 않았다.
 
 #### 학습 답변 검토
 

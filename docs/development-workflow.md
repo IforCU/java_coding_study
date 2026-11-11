@@ -52,6 +52,8 @@ git switch -c phase-01
 
 ## 코드 작업 환경 확인
 
+Maven Wrapper 추가 후에는 JDK만 준비하면 `mvn` 전역 설치 없이 실행할 수 있습니다. Windows에서는 `.\mvnw.cmd -v`, Linux/macOS에서는 `sh ./mvnw -v`로 확인합니다. 기존 로컬 검증 스크립트도 Wrapper를 우선 사용하므로 아래 `.tools` Maven 점검은 이전 방식의 대체 수단입니다. 최초 실행 시 네트워크가 필요하고 배포본·의존성·임시 파일은 프로젝트 `.cache`에 보관합니다.
+
 IDE에서 저장소 루트를 열고 Maven 프로젝트로 가져온다. 로컬 컴파일·디버깅 시 프로젝트 SDK와 Maven 실행 JDK를 17로 맞추고 파일 인코딩은 UTF-8로 설정한다. 호스트 Java/Maven이 없어도 Docker 빌드는 가능하지만, IDE의 로컬 컴파일에는 JDK가 필요하다. 전역 설치나 시스템 설정 변경 대신 프로젝트 내부 도구를 사용한다.
 
 ```powershell

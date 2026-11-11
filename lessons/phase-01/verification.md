@@ -4,10 +4,18 @@
 
 ## 정상 모듈 빌드와 테스트
 
-Java 17과 Maven을 사용할 수 있는 환경에서 다음 명령을 실행합니다. 전역 설치 없이 프로젝트 내부 `.tools`의 Maven을 사용할 수도 있습니다. 프로젝트의 Maven 캐시 경로는 루트 안내를 따릅니다.
+JDK 17을 준비하고 Maven Wrapper로 실행합니다. Maven 전역 설치는 필요하지 않습니다. 최초 실행 시 인터넷 연결이 필요하며 배포본과 의존성은 프로젝트 `.cache`에 저장됩니다.
+
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -pl modules/01-java-core -am verify
+```
+
+Linux/macOS:
 
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -pl modules/01-java-core -am verify
+sh ./mvnw -pl modules/01-java-core -am verify
 ```
 
 기대 결과: 고객과 계좌 소유 관계, 입출금, 금액 검증, 잔액 부족, 실패 후 상태 보존, 거래 기록, 조회 스냅샷에 대한 테스트가 성공합니다. 결과 보고서는 `modules/01-java-core/target/surefire-reports`에 생성됩니다.
@@ -41,13 +49,21 @@ docker compose --profile phase1 run --build --rm java-core
 
 ## 미완성 실습 검증
 
+Windows PowerShell:
+
+```powershell
+.\mvnw.cmd -Pexercise-phase1 -pl exercises/starter/phase-01 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase1 -pl exercises/starter/phase-01 -am verify
+sh ./mvnw -Pexercise-phase1 -pl exercises/starter/phase-01 -am verify
 ```
 
 TODO 상태에서는 `UnsupportedOperationException`으로 실패해야 합니다. 구현 뒤에는 일반 출금, 잔액과 동일한 금액, scale 차이, 0·음수·소수·null, 큰 금액의 정밀도, 입력과 반복 호출 보존에 대한 계약 테스트가 모두 통과해야 합니다.
 
-기본 `mvn -Dmaven.repo.local=.cache/maven-repository verify`의 성공과 실습 TODO의 완료는 별개입니다. 실습은 선택한 프로필에서 검증합니다. 정답 비교가 필요할 때만 별도 solutions 디렉터리의 안내를 확인합니다.
+기본 Wrapper `verify`의 성공과 실습 TODO의 완료는 별개입니다. 실습은 선택한 프로필에서 검증합니다. 정답 비교가 필요할 때만 별도 solutions 디렉터리의 안내를 확인합니다.
 
 ## 기록 기준
 

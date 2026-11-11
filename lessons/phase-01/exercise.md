@@ -35,8 +35,16 @@
 
 프로젝트 루트에서 명시적으로 실습 프로필을 선택합니다.
 
+Windows PowerShell (JDK 준비 후 Maven 별도 설치 없이 실행):
+
+```powershell
+.\mvnw.cmd -Pexercise-phase1 -pl exercises/starter/phase-01 -am verify
+```
+
+Linux/macOS:
+
 ```sh
-mvn -Dmaven.repo.local=.cache/maven-repository -Pexercise-phase1 -pl exercises/starter/phase-01 -am verify
+sh ./mvnw -Pexercise-phase1 -pl exercises/starter/phase-01 -am verify
 ```
 
 아직 TODO를 구현하지 않은 상태는 테스트가 실패하는 것이 기대 결과입니다. 이 실패는 정상 실행 모듈의 장애와 구분합니다. 구현 후 계약 테스트를 통과시키고 실패 원인과 수정 이유를 자신의 말로 기록하세요. 테스트를 삭제하거나 기대값을 바꿔 통과시키지 않습니다.
