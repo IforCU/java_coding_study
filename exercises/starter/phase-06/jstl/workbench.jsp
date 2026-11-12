@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<fmt:setLocale value="ko_KR"/>
 <!doctype html>
 <html lang="ko">
     <head>
@@ -38,16 +39,35 @@
                 TODO 4: 성공/실패 모두 id=request-id에 api.requestId를 c:out으로 표시한다.
                 TODO 5: 실패에는 성공 표/빈 목록 안내를 출력하지 않는다. 원본 JSON, SQL 오류, 인증정보를 출력하지 않는다.
                 이 화면은 API 응답 DTO fixture 표시 과제다. JSP에서 HTTP 호출하거나 Boot API에 JSP를 추가하지 않는다. --%>
-                <p class="placeholder">JSTL로 아래 예시 행을 반복·조건 처리하고 데이터와 결과 문구를 완성하세요.</p>
-                <table>
-                    <caption>실습 결과</caption>
-                    <tbody>
-                        <tr class="record-row">
-                            <td>TODO</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p>표시 건수: <span id="record-count">TODO</span></p>
+                <p>요청 ID: <span id="request-id"><c:out value="${api.requestId}"/></span></p>
+                <c:choose>
+                    <c:when test="${api.success}">
+                        <table>
+                            <caption>API 조회 결과</caption>
+                            <thead>
+                                <tr>
+                                    <th>별칭</th>
+                                    <th>잔액</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach items="${api.data.accounts}" var="entry">
+                                    <tr class="record-row">
+                                        <td><c:out value="${entry.name}"/></td>
+                                        <td><fmt:formatNumber value="${entry.balance}" type="number" groupingUsed="true"/>원</td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                        <p>표시 건수: <span id="record-count"><c:out value="${fn:length(api.data.accounts)}"/></span></p>
+                        <c:if test="${empty api.data.accounts}">
+                            <p id="empty-message">조회 계좌가 없습니다.</p>
+                        </c:if>
+                    </c:when>
+                    <c:otherwise>
+                        <p id="api-error"><c:out value="${api.message}"/></p>
+                    </c:otherwise>
+                </c:choose>
             </section>
         </main>
     </body>
