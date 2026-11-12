@@ -1,20 +1,22 @@
 package kr.banklearning.api.service;
 
 public final class BankProblem extends RuntimeException {
-    private final int status;
-    private final String code;
+    private final BankErrorCode errorCode;
 
-    public BankProblem(int status, String code) {
-        super(code);
-        this.status = status;
-        this.code = code;
+    public BankProblem(BankErrorCode errorCode) {
+        super(errorCode.getCode());
+        this.errorCode = errorCode;
+    }
+
+    public BankErrorCode getErrorCode() {
+        return errorCode;
     }
 
     public int status() {
-        return status;
+        return errorCode.getStatus();
     }
 
     public String code() {
-        return code;
+        return errorCode.getCode();
     }
 }

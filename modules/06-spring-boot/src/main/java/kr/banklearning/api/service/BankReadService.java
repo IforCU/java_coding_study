@@ -34,23 +34,23 @@ public class BankReadService {
 
     public CustomerView customer(UUID id, String username, boolean admin) {
         owner(id, username, admin);
-        return repository.customer(id).orElseThrow(() -> new BankProblem(404, "NOT_FOUND"));
+        return repository.customer(id).orElseThrow(() -> new BankProblem(BankErrorCode.NOT_FOUND));
     }
 
     public AccountView account(UUID id, String username, boolean admin) {
         AccountView account =
-                repository.account(id).orElseThrow(() -> new BankProblem(404, "NOT_FOUND"));
+                repository.account(id).orElseThrow(() -> new BankProblem(BankErrorCode.NOT_FOUND));
         owner(account.customerId(), username, admin);
         return account;
     }
 
     public List<TransactionView> transactions(
             UUID id, String from, String to, int limit, String username, boolean admin) {
-        if (limit < 1 || limit > 200) throw new BankProblem(400, "INVALID_REQUEST");
+        if (limit < 1 || limit > 200) throw new BankProblem(BankErrorCode.INVALID_REQUEST);
         account(id, username, admin);
         LocalDate first = date(from), last = date(to);
         if (first != null && last != null && first.isAfter(last))
-            throw new BankProblem(400, "INVALID_REQUEST");
+            throw new BankProblem(BankErrorCode.INVALID_REQUEST);
         try {
             return List.copyOf(
                     repository.transactions(
@@ -61,7 +61,7 @@ public class BankReadService {
                                     : last.plusDays(1).atStartOfDay(ZONE).toOffsetDateTime(),
                             limit));
         } catch (DateTimeException exception) {
-            throw new BankProblem(400, "INVALID_REQUEST");
+            throw new BankProblem(BankErrorCode.INVALID_REQUEST);
         }
     }
 
@@ -79,19 +79,19 @@ public class BankReadService {
     }
 
     public StatisticsView statistics(String from, String to, boolean admin) {
-        if (!admin) throw new BankProblem(403, "FORBIDDEN");
+        if (!admin) throw new BankProblem(BankErrorCode.FORBIDDEN);
         LocalDate first = date(from), last = date(to);
         if (first == null && last == null) first = last = LocalDate.now(clock.withZone(ZONE));
         else if (first == null) first = last;
         else if (last == null) last = first;
         if (first.isAfter(last) || ChronoUnit.DAYS.between(first, last) >= 366)
-            throw new BankProblem(400, "INVALID_REQUEST");
+            throw new BankProblem(BankErrorCode.INVALID_REQUEST);
         return repository.statistics(first, last);
     }
 
     private static void owner(UUID customerId, String username, boolean admin) {
         if (!admin && !("learner".equals(username) && LEARNER_CUSTOMER.equals(customerId)))
-            throw new BankProblem(403, "FORBIDDEN");
+            throw new BankProblem(BankErrorCode.FORBIDDEN);
     }
 
     private static LocalDate date(String value) {
@@ -102,7 +102,7 @@ public class BankReadService {
                 throw new DateTimeException("range");
             return parsed;
         } catch (DateTimeException exception) {
-            throw new BankProblem(400, "INVALID_REQUEST");
+            throw new BankProblem(BankErrorCode.INVALID_REQUEST);
         }
     }
 }
