@@ -1,5 +1,11 @@
 # Project Progress
 
+## 2026-11-12 Phase 06 JSP lab API fixture 가독성 정리
+
+- `WorkbenchServlet`의 API 계좌 고정 데이터를 `API_ACCOUNTS` 상수로 분리하고 List·Map 구성은 별도 `api(available, empty)` 메서드로 옮겼다. `doGet()`에서는 다른 속성처럼 `setAttribute()` 한 줄로 전달한다. 기존 중첩 구조와 demo 동작은 유지했고 작성 중인 starter JSP는 수정하지 않았다.
+- **PASS:** `.\mvnw.cmd -o -f exercises/jstl-bank-lab/pom.xml "-Pjstl-phase6,jstl-solution" verify`, HTTP/Jasper 계약 테스트 5개, failures/errors/skipped 0, WAR 빌드 성공.
+- Docker/DB 통합 검증은 **NOT RUN / 대기**다. 이번 변경은 고정 fixture 구성 정리이며 신규 기능이나 학습 문제 변경은 없다.
+
 ## 2026-11-11 본편 Java 줄바꿈과 들여쓰기
 
 - `phase-04`의 깨끗한 작업 폴더에서 시작했다. `modules`의 Java 113개를 읽고 Google Java Format 1.24.0의 AOSP 방식으로 4칸 들여쓰기를 적용했다. 기존 서식과 일치한 14개를 제외한 소스·테스트 99개가 변경됐다. import 정렬·삭제, 긴 문자열 재작성, Javadoc 재서식은 비활성화했다. 실습 starter/solutions는 수정하지 않았다.
