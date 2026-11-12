@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 import kr.banklearning.mvc.StubMapper;
 import org.junit.jupiter.api.Test;
