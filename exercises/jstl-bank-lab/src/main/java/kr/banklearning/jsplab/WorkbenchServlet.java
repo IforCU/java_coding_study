@@ -25,6 +25,9 @@ public final class WorkbenchServlet extends HttpServlet {
     private static final List<Map<String, Object>> AUDIT = List.of(
             Map.of("id", "A01", "account", "110-***-0001", "action", "조회 <확인>", "requestId", "req-lab-01"),
             Map.of("id", "A02", "account", "220-***-0002", "action", "접근 거절", "requestId", "req-lab-02"));
+    private static final List<Map<String, Object>> API_ACCOUNTS = List.of(
+            Map.of("name", "생활비 <통장>", "balance", new BigDecimal("1250000")),
+            Map.of("name", "여행 적금", "balance", new BigDecimal("350000")));
 
     private static Map<String, Object> history(String id, String type, String memo, String amount, String time) {
         return Map.of("id", id, "type", type, "memo", memo, "amount", new BigDecimal(amount),
@@ -43,11 +46,17 @@ public final class WorkbenchServlet extends HttpServlet {
         request.setAttribute("transfers", empty ? List.of() : TRANSFERS);
         request.setAttribute("canViewAudit", allowed);
         request.setAttribute("audit", allowed && !empty ? AUDIT : List.of());
-        request.setAttribute("api", Map.of("success", available, "requestId", "api-lab-01",
-                "message", available ? "조회 완료" : "잠시 후 다시 조회해 주세요.",
-                "data", Map.of("accounts", available && !empty ? List.of(
-                        Map.of("name", "생활비 <통장>", "balance", new BigDecimal("1250000")),
-                        Map.of("name", "여행 적금", "balance", new BigDecimal("350000"))) : List.of())));
+        request.setAttribute("api", api(available, empty));
         request.getRequestDispatcher("/WEB-INF/views/workbench.jsp").forward(request, response);
+    }
+
+    private static Map<String, Object> api(boolean available, boolean empty) {
+        List<Map<String, Object>> accounts = available && !empty ? API_ACCOUNTS : List.of();
+        Map<String, Object> data = Map.of("accounts", accounts);
+        return Map.of(
+                "success", available,
+                "requestId", "api-lab-01",
+                "message", available ? "조회 완료" : "잠시 후 다시 조회해 주세요.",
+                "data", data);
     }
 }
