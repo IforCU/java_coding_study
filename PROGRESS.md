@@ -1,5 +1,13 @@
 # Project Progress
 
+## 2026-11-12 main 리팩토링 선택 반영 및 재검증
+
+- 사용자 지시에 따라 문서 동기화를 `14d9e58`로 커밋하고, `8bb2769` → `9086ff2`(오류 코드 enum), `676f63f` → `309c44d`(MDC), `5ec6c86` → `ec911b0`(JSP fixture 구성)을 main에 `cherry-pick -x`로 반영했다. 학습 답안 커밋은 제외했다. PROGRESS 충돌은 양쪽 기록을 모두 보존해 해결했으며 소스 충돌은 없었다.
+- **PASS:** `.\mvnw.cmd -o verify`, 기본 7모듈 빌드 및 테스트 171개 성공, failures/errors/skipped 0. Maven Wrapper의 Java 17 환경에서 검증했다. 로그: `.cache/cherry-pick-main-verify.log`.
+- **PASS:** `.\mvnw.cmd -o -f exercises/jstl-bank-lab/pom.xml "-Pjstl-phase6,jstl-solution" verify`, HTTP/Jasper 계약 5개, failures/errors/skipped 0, WAR 빌드 성공. 로그: `.cache/cherry-pick-jstl-phase6.log`.
+- enum의 줄 끝 공백만 후속 정리했다. 구현 동작과 학습 문제는 추가 변경하지 않았다. 작업 중 발견된 Phase 3의 `BankController.java`, `BankServiceTest.java` import 삭제는 이번 작업에서 수행한 변경이 아니므로 커밋에서 제외하고 보존한다.
+- **NOT RUN / 대기:** Docker/DB 재검증 및 브라우저 시각 검토. 기존 PASS와 이번 로컬 검증을 구분한다. Git push·외부 배포·브랜치 전환은 수행하지 않았다.
+
 ## 2026-11-12 AGENTS·PLAN·PROGRESS 동기화 및 cherry-pick 준비
 
 - `AGENTS.md`, `PLAN.md`, `PROGRESS.md`와 로컬 Git 이력을 확인했다. 시작 시 작업 폴더는 깨끗하며 실제 체크아웃은 `main`(`6f39123`)이다. `phase-06`은 `a8a3478`이다. 로컬 원격 추적 참조는 서버의 최신 상태를 보장하지 않으며 fetch/pull/push는 수행하지 않았다.

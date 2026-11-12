@@ -22,5 +22,5 @@ public enum BankErrorCode {
 
     public String getCode() {
         return code;
-    }    
+    }
 }
